@@ -1,0 +1,31 @@
+# Status
+
+- [x] Add a concrete local GitHub Classroom development workflow to the repo docs and scripts
+- [x] Verify the local autograding workflow on the current tree
+- [x] Commit the Classroom local-development changes
+- [x] Make LAB_ID the explicit recommended GitHub Classroom progression model
+- [x] Verify the autograder with LAB_ID set explicitly
+- [x] Commit the LAB_ID recommendation updates
+- [x] Add instructor tooling to set LAB_ID on GitHub repos
+- [x] Verify the LAB_ID tooling locally
+- [x] Commit the LAB_ID tooling
+- [x] Document the one-assignment + LAB_ID operator workflow
+- [x] Commit the operator workflow docs
+- [x] Add Classroom export parsing to the LAB_ID instructor tooling
+- [x] Verify Classroom export parsing locally
+- [x] Commit the Classroom export tooling
+- [x] Document the CSV-based cohort workflow
+- [x] Commit the CSV-based workflow docs
+- [x] Add instructor progress reporting for Classroom repos
+- [x] Verify the progress report tooling locally
+- [x] Commit the progress report tooling
+- [x] Document the progress report workflow
+- [x] Commit the progress report docs
+- [x] Add a safe cohort advancement helper for ready repos
+- [x] Verify the advancement helper locally
+- [x] Commit the advancement helper
+- [x] Document the ready-to-advance workflow
+- [x] Commit the advancement workflow docs
+- [x] Add a repo-root .gitignore for local and generated files
+- [x] Verify the .gitignore against the current workspace
+- [x] Commit the .gitignore update
