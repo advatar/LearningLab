@@ -5,7 +5,7 @@ import type { Readable } from 'node:stream'
 import type { Request, Response } from 'express'
 import QRCode from 'qrcode'
 import { STEP_DEFS, type StepId } from './steps.js'
-import { createUnsignedProofJwt, isAllowedRelayTarget, normalizeGitHubUrl, waitFor } from './utils.js'
+import { createUnsignedProofJwt, isAllowedRelayTarget, resolveRepoUrl, waitFor } from './utils.js'
 
 type ServiceName = 'issuer' | 'verifier'
 type ServiceMode = 'dev' | 'start'
@@ -145,7 +145,7 @@ export class DemoController {
   }
 
   async init() {
-    this.state.repoUrl = this.resolveRepoUrl()
+    this.state.repoUrl = resolveRepoUrl(process.env.DEMO_CONDUCTOR_REPO_URL, this.readGitRemote())
     if (this.state.repoUrl) {
       this.state.qrSvg = await QRCode.toString(this.state.repoUrl, {
         type: 'svg',
@@ -266,7 +266,7 @@ export class DemoController {
     return {
       status: 'stopped',
       pid: null,
-      command: buildServiceCommand(name, SERVICE_MODE),
+      command: buildServiceSpec(this.repoRoot, name, SERVICE_MODE).displayCommand,
       env: {},
       startedAt: null,
       lastExitCode: null,
@@ -544,9 +544,9 @@ export class DemoController {
       await this.stopService(name)
     }
 
-    const args = ['--filter', name, SERVICE_MODE]
-    const child = spawn('pnpm', args, {
-      cwd: this.repoRoot,
+    const spec = buildServiceSpec(this.repoRoot, name, SERVICE_MODE)
+    const child = spawn(spec.command, spec.args, {
+      cwd: spec.cwd,
       env: {
         ...process.env,
         ...env,
@@ -769,12 +769,12 @@ export class DemoController {
     await fs.writeFile(filePath, JSON.stringify(payload, null, 2))
   }
 
-  private resolveRepoUrl() {
+  private readGitRemote() {
     const remote = spawnSync('git', ['config', '--get', 'remote.origin.url'], {
       cwd: this.repoRoot,
       encoding: 'utf8'
     })
-    return normalizeGitHubUrl(remote.stdout || null)
+    return remote.stdout || null
   }
 }
 
@@ -786,4 +786,22 @@ function buildServiceCommand(name: ServiceName, mode: ServiceMode) {
 
 function parseServiceMode(value: string | undefined): ServiceMode {
   return value === 'start' ? 'start' : 'dev'
+}
+
+function buildServiceSpec(repoRoot: string, name: ServiceName, mode: ServiceMode) {
+  if (mode === 'start') {
+    return {
+      command: 'node',
+      args: ['dist/index.js'],
+      cwd: path.join(repoRoot, name),
+      displayCommand: `node ${name}/dist/index.js`
+    }
+  }
+
+  return {
+    command: 'pnpm',
+    args: ['--filter', name, 'dev'],
+    cwd: repoRoot,
+    displayCommand: buildServiceCommand(name, mode)
+  }
 }

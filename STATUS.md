@@ -6,6 +6,8 @@
 - [x] Add a local launcher script and Docker Compose entrypoint for the demo conductor
 - [x] Verify the local launcher and Docker artifacts
 - [x] Commit the local launcher and Docker updates
+- [x] Preserve the repo QR code when the demo conductor runs in Docker
+- [x] Make service restarts reliable in Docker start mode
 - [x] Add a concrete local GitHub Classroom development workflow to the repo docs and scripts
 - [x] Verify the local autograding workflow on the current tree
 - [x] Commit the Classroom local-development changes

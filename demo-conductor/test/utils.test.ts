@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { createUnsignedProofJwt, isAllowedRelayTarget, normalizeGitHubUrl } from '../src/utils.ts'
+import { createUnsignedProofJwt, isAllowedRelayTarget, normalizeGitHubUrl, resolveRepoUrl } from '../src/utils.ts'
 
 test('createUnsignedProofJwt encodes a nonce-bearing payload', () => {
   const token = createUnsignedProofJwt({ nonce: 'abc123', aud: 'http://localhost:3001/credential' })
@@ -23,4 +23,15 @@ test('normalizeGitHubUrl converts SSH and HTTPS remotes to clean repo URLs', () 
   assert.equal(normalizeGitHubUrl('git@github.com:advatar/LearningLab.git'), 'https://github.com/advatar/LearningLab')
   assert.equal(normalizeGitHubUrl('https://github.com/advatar/LearningLab.git'), 'https://github.com/advatar/LearningLab')
   assert.equal(normalizeGitHubUrl('not-a-remote'), null)
+})
+
+test('resolveRepoUrl prefers explicit configuration over git metadata', () => {
+  assert.equal(
+    resolveRepoUrl('https://example.com/custom-repo', 'git@github.com:advatar/LearningLab.git'),
+    'https://example.com/custom-repo'
+  )
+  assert.equal(
+    resolveRepoUrl('', 'git@github.com:advatar/LearningLab.git'),
+    'https://github.com/advatar/LearningLab'
+  )
 })

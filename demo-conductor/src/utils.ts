@@ -28,6 +28,12 @@ export function normalizeGitHubUrl(raw: string | null | undefined) {
   return null
 }
 
+export function resolveRepoUrl(configured: string | null | undefined, remote: string | null | undefined) {
+  const configuredValue = String(configured || '').trim()
+  if (configuredValue) return configuredValue
+  return normalizeGitHubUrl(remote)
+}
+
 export async function waitFor<T>(
   check: () => Promise<T | false> | T | false,
   {

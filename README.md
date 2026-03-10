@@ -91,6 +91,7 @@ Containerized launch:
 
 - `pnpm demo:docker`
 - or `docker compose up --build demo-conductor`
+- set `DEMO_CONDUCTOR_REPO_URL` if you want the QR code to point somewhere other than the default repo URL baked into `docker-compose.yml`
 
 Fast development mode:
 
