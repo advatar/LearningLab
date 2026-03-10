@@ -4,6 +4,7 @@ Monorepo implementing the architecture described in `DEMO.md`:
 
 - issuer/ — OID4VCI issuer (SD-JWT VC + DI/BBS+ modes)
 - verifier/ — OID4VP relying party with Digital Credentials API + DPoP/WebAuthn stubs
+- demo-conductor/ — local presenter UI that stages the Village speed-build demo
 - ohttp/ — Cloudflare Privacy Gateway Worker (relay) template
 - bbs-lib/ — BBS+ helper (Node + WASM/Rust via @mattrglobal/bbs-signatures)
 - status-list/ — Bitstring Status List generator and sample list
@@ -69,6 +70,23 @@ pnpm --filter status-list run generate
 ```
 
 See `DEMO.md` for architecture and `LEARNING_LAB.md` for the 2-hour lab.
+
+## Village demo conductor
+
+For the Village presentation, use the local demo conductor instead of walking attendees through a terminal build.
+
+1. Install workspace dependencies: `pnpm install -r`
+2. Start the conductor UI: `pnpm demo:conductor`
+3. Open `http://localhost:3210`
+4. Run the built-in scenario steps:
+   - Start issuer
+   - Start verifier
+   - Issue SD-JWT
+   - Issue BBS+
+   - Enable relay
+   - Revoke credential
+
+The conductor starts and restarts issuer/verifier for you, shows the exact HTTP calls and responses, exposes live issuer/verifier debug state, includes a built-in local relay view for the OHTTP story, and renders a QR code to the GitHub repo for the take-home handoff.
 
 ## Lab tracks (step-by-step)
 - Lab 00: labs/README-lab-00-start.md

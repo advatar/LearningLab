@@ -8,6 +8,7 @@
     "preinstall": "node scripts/check-node-version.js",
     "build": "pnpm -r build",
     "dev": "pnpm -r --parallel --filter issuer --filter verifier dev",
+    "demo:conductor": "pnpm --filter demo-conductor dev",
     "lint": "echo 'TODO: add lint' && exit 0",
     "lab:check": "pnpm --filter bbs-lib build && node scripts/lab-check.js",
     "classroom:advance": "node scripts/classroom-advance.js",

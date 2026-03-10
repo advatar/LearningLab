@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>LearningLab Demo Conductor</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <main class="page">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">Village Speed Build</p>
+          <h1>LearningLab Demo Conductor</h1>
+          <p class="lede">
+            Control the platform build on the laptop, surface the real HTTP calls, and keep the
+            audience focused on what changed at each step.
+          </p>
+        </div>
+        <div class="hero-actions">
+          <button id="reset-button" class="button button-secondary" type="button">Reset Demo</button>
+          <a id="repo-link" class="button button-primary" href="#" target="_blank" rel="noreferrer">Open Repo</a>
+        </div>
+      </header>
+
+      <section class="layout">
+        <section class="panel">
+          <div class="panel-heading">
+            <h2>System Build</h2>
+            <p>Components light up as the demo assembles.</p>
+          </div>
+          <div id="component-grid" class="component-grid"></div>
+          <div class="snapshots">
+            <div class="snapshot">
+              <h3>Issuer Snapshot</h3>
+              <pre id="issued-snapshot"></pre>
+            </div>
+            <div class="snapshot">
+              <h3>Verifier Snapshot</h3>
+              <pre id="presentation-snapshot"></pre>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-heading">
+            <h2>Scenario Steps</h2>
+            <p>Run the presentation in a fixed order or replay individual moves.</p>
+          </div>
+          <div id="step-list" class="step-list"></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-heading">
+            <h2>Evidence</h2>
+            <p>Every step shows the exact request, response, or process change.</p>
+          </div>
+          <div id="status-banner" class="status-banner"></div>
+          <div id="evidence-list" class="evidence-list"></div>
+          <div class="logs">
+            <div>
+              <h3>Issuer Logs</h3>
+              <pre id="issuer-logs"></pre>
+            </div>
+            <div>
+              <h3>Verifier Logs</h3>
+              <pre id="verifier-logs"></pre>
+            </div>
+          </div>
+          <div class="relay-panel">
+            <h3>Relay Traffic</h3>
+            <div id="relay-events" class="relay-events"></div>
+          </div>
+        </section>
+      </section>
+
+      <footer class="takeaway panel">
+        <div>
+          <p class="eyebrow">Take It Home</p>
+          <h2>Clone the project after the demo</h2>
+          <p id="repo-url-text" class="repo-url"></p>
+        </div>
+        <div id="qr-wrapper" class="qr-wrapper"></div>
+      </footer>
+    </main>
+
+    <script src="/app.js" defer></script>
+  </body>
+</html>
