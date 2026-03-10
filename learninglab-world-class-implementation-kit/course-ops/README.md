@@ -83,6 +83,16 @@ node src/cli.mjs progress \
   --out ../artifacts/progress.lab-01.json
 ```
 
+### Advance only repos that are ready
+```bash
+node src/cli.mjs advance-ready \
+  --config ../catalog/course.config.example.yaml \
+  --progress ../artifacts/progress.lab-01.json \
+  --from 01 \
+  --out ../artifacts/advance.lab-01.json \
+  --apply
+```
+
 ### Publish Google Classroom course work
 ```bash
 node src/cli.mjs publish-google \
@@ -110,4 +120,5 @@ node src/cli.mjs sync-grades \
 - `join-identities` fails closed when a Google Classroom student has no GitHub username match or when duplicate identity keys exist.
 - The GitHub commands assume the automation token can create repos from the template, set repo variables, add collaborators, and read workflow runs.
 - `progress` reads `LAB_ID` plus the latest workflow run to identify which repos are ready to advance.
+- `advance-ready` consumes the progress artifact and only updates `LAB_ID` for repos already marked ready.
 - The grade sync writes `draftGrade` by default unless your course config enables assigned-grade publication.

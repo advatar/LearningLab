@@ -7,6 +7,7 @@ import { loadCourseConfig, loadAssignment, buildRepoName, buildRepoDescription }
 import { loadRoster, loadGitHubIdentities, renderRosterCsv } from './lib/csv.mjs'
 import { ensureDir, absoluteFrom, writeJson, writeText, readJson } from './lib/fs.mjs'
 import { renderCourseworkDescription, renderPlanMarkdown } from './lib/strings.mjs'
+import { planReadyAdvancement, summarizeAdvancementPlan } from './lib/advancement.mjs'
 import {
   createGitHubClient,
   createRepoFromTemplate,
@@ -73,6 +74,9 @@ async function main() {
       return
     case 'progress':
       await handleProgress({ args, courseConfig })
+      return
+    case 'advance-ready':
+      await handleAdvanceReady({ args, courseConfig })
       return
     case 'publish-google':
       await handlePublishGoogle({ args, courseConfig, assignment })
@@ -411,6 +415,73 @@ async function handleProgress({ args, courseConfig }) {
     workflowBranch: courseConfig.github.defaultBranch,
     counts,
     repos: repoProgress
+  })
+  console.log(`[course-ops] wrote ${out}`)
+}
+
+async function handleAdvanceReady({ args, courseConfig }) {
+  if (!args.progress) throw new Error('--progress is required for advance-ready')
+
+  const progressPath = path.resolve(args.progress)
+  const progressArtifact = await readJson(progressPath)
+  const plan = planReadyAdvancement(progressArtifact.repos || [], {
+    fromLabId: args.from || null
+  })
+  const counts = summarizeAdvancementPlan(plan)
+  const client = args.dryRun ? null : createGitHubClient()
+  const repos = []
+
+  for (const row of plan) {
+    if (row.action !== 'advance') {
+      repos.push({
+        ...row,
+        mode: args.dryRun ? 'dry-run' : 'skipped'
+      })
+      continue
+    }
+
+    if (args.dryRun) {
+      repos.push({
+        ...row,
+        mode: 'dry-run',
+        variableAction: null
+      })
+      continue
+    }
+
+    const variableResult = await upsertRepositoryVariable(client, {
+      owner: row.repoOwner,
+      repo: row.repoName,
+      name: 'LAB_ID',
+      value: row.targetLabId
+    })
+
+    repos.push({
+      ...row,
+      mode: 'apply',
+      variableAction: variableResult.action
+    })
+  }
+
+  const out = args.out
+    ? path.resolve(args.out)
+    : path.resolve(
+      courseConfig.__baseDir,
+      courseConfig.paths.artifactsDir,
+      `advance.${progressArtifact.assignment?.id || courseConfig.course.slug}.json`
+    )
+
+  await writeJson(out, {
+    generatedAt: new Date().toISOString(),
+    mode: args.dryRun ? 'dry-run' : 'apply',
+    course: courseConfig.course,
+    assignment: progressArtifact.assignment || null,
+    progressPath,
+    filter: {
+      fromLabId: args.from || null
+    },
+    counts,
+    repos
   })
   console.log(`[course-ops] wrote ${out}`)
 }

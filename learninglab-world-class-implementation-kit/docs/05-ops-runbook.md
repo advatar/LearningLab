@@ -72,6 +72,16 @@ node src/cli.mjs progress \
   --out ../artifacts/progress.lab-01.json
 ```
 
+### Advance ready repos to the next lab
+```bash
+node src/cli.mjs advance-ready \
+  --config ../catalog/course.config.example.yaml \
+  --progress ../artifacts/progress.lab-01.json \
+  --from 01 \
+  --out ../artifacts/advance.lab-01.json \
+  --apply
+```
+
 ### Create Classroom coursework as draft
 ```bash
 node src/cli.mjs publish-google \
@@ -103,16 +113,18 @@ node src/cli.mjs sync-grades \
 5. provision-github dry-run
 6. provision-github apply
 7. progress
-8. publish-google draft
-9. UI check in Classroom
-10. publish-google published or patch state
-11. monitor first workflows
+8. advance-ready
+9. publish-google draft
+10. UI check in Classroom
+11. publish-google published or patch state
+12. monitor first workflows
 
 ### Grading
 1. progress identifies repos that have passed the current lab
-2. nightly grade sync writes `draftGrade`
-3. instructor reviews outliers
-4. when ready, rerun with assigned-grade publication enabled
+2. advance-ready moves only the passing repos to the next `LAB_ID`
+3. nightly grade sync writes `draftGrade`
+4. instructor reviews outliers
+5. when ready, rerun with assigned-grade publication enabled
 
 ## Expected artifacts
 
@@ -155,6 +167,13 @@ Contains:
 - latest workflow status and conclusion
 - ready-to-advance flag
 - workflow run URL
+
+### Advancement artifact
+Contains:
+- apply/dry-run mode
+- optional `fromLabId` filter
+- counts for advanced vs skipped repos
+- per-repo advancement decision and resulting `LAB_ID`
 
 ### Coursework artifact
 Contains:

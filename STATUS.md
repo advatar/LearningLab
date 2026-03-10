@@ -55,6 +55,9 @@
 - [x] Add GitHub progress reporting to the course-ops control plane
 - [x] Verify the progress reporting locally
 - [x] Commit the progress reporting
-- [ ] Add ready-only lab advancement to the course-ops control plane
-- [ ] Verify the advancement flow locally
-- [ ] Commit the advancement flow
+- [x] Add ready-only lab advancement to the course-ops control plane
+- [x] Verify the advancement flow locally
+- [x] Commit the advancement flow
+- [ ] Add a reconciliation report to the course-ops control plane
+- [ ] Verify the reconciliation flow locally
+- [ ] Commit the reconciliation flow

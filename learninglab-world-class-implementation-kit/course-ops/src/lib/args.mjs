@@ -11,10 +11,12 @@ export function parseArgs(argv) {
     googleRoster: null,
     identities: null,
     repoMap: null,
+    progress: null,
     coursework: null,
     courseworkId: null,
     reportOut: null,
     out: null,
+    from: null,
     help: false
   }
 
@@ -39,6 +41,8 @@ export function parseArgs(argv) {
     else if (arg.startsWith('--identities=')) flags.identities = arg.split('=')[1]
     else if (arg === '--repo-map') flags.repoMap = rest[++i]
     else if (arg.startsWith('--repo-map=')) flags.repoMap = arg.split('=')[1]
+    else if (arg === '--progress') flags.progress = rest[++i]
+    else if (arg.startsWith('--progress=')) flags.progress = arg.split('=')[1]
     else if (arg === '--coursework') flags.coursework = rest[++i]
     else if (arg.startsWith('--coursework=')) flags.coursework = arg.split('=')[1]
     else if (arg === '--coursework-id') flags.courseworkId = rest[++i]
@@ -47,6 +51,8 @@ export function parseArgs(argv) {
     else if (arg.startsWith('--report-out=')) flags.reportOut = arg.split('=')[1]
     else if (arg === '--out') flags.out = rest[++i]
     else if (arg.startsWith('--out=')) flags.out = arg.split('=')[1]
+    else if (arg === '--from') flags.from = rest[++i]
+    else if (arg.startsWith('--from=')) flags.from = arg.split('=')[1]
     else if (arg === '--state') flags.state = rest[++i]
     else if (arg.startsWith('--state=')) flags.state = arg.split('=')[1]
     else throw new Error(`Unknown argument: ${arg}`)
@@ -64,6 +70,7 @@ Usage:
   node src/cli.mjs plan --config <file> --assignment <file> --roster <file> [--out <file>]
   node src/cli.mjs provision-github --config <file> --assignment <file> --roster <file> [--out <file>] [--apply]
   node src/cli.mjs progress --config <file> --repo-map <file> [--out <file>]
+  node src/cli.mjs advance-ready --config <file> --progress <file> [--from <lab-id>] [--out <file>] [--apply]
   node src/cli.mjs publish-google --config <file> --assignment <file> [--out <file>] [--state DRAFT|PUBLISHED] [--apply]
   node src/cli.mjs patch-google --config <file> --assignment <file> (--coursework <file> | --coursework-id <id>) [--out <file>] [--state DRAFT|PUBLISHED] [--apply]
   node src/cli.mjs sync-grades --config <file> --assignment <file> --repo-map <file> (--coursework <file> | --coursework-id <id>) [--out <file>] [--apply]
