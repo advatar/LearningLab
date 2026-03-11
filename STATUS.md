@@ -89,3 +89,7 @@
 - [x] Verify the Railway deployment changes locally
 - [x] Commit the Railway deployment prep
 - [x] Deploy the demo conductor to Railway
+- [x] Fix the demo conductor snapshot/log overflow layout
+- [x] Verify the layout fix locally
+- [ ] Commit the layout fix
+- [ ] Redeploy the layout fix to Railway
