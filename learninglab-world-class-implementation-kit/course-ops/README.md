@@ -21,6 +21,17 @@ pnpm install
 
 Then fill the secrets in `.env`.
 
+For short-lived local runs, you can also skip the refresh-token bundle and
+export `GOOGLE_ACCESS_TOKEN` directly, for example:
+
+```bash
+GOOGLE_ACCESS_TOKEN="$(gcloud auth print-access-token)" \
+node src/cli.mjs import-google-roster --config ../catalog/course.config.example.yaml
+```
+
+That token still needs Google Classroom scopes; an ordinary Cloud SDK token
+without Classroom scopes will be rejected by the API.
+
 Workflow scaffolding is included under `.github/workflows/` for manual release and nightly grade sync once this package is promoted into its own repo.
 
 ## Required external inputs

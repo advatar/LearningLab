@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { buildCourseWorkPatch, buildStudentSubmissionGradePatch } from '../src/lib/google.mjs'
+import { buildCourseWorkPatch, buildStudentSubmissionGradePatch, createGoogleClient } from '../src/lib/google.mjs'
 
 test('buildCourseWorkPatch selects only patchable coursework fields', () => {
   const patch = buildCourseWorkPatch({
@@ -65,4 +65,44 @@ test('buildStudentSubmissionGradePatch includes only changed grade fields', () =
     updateMask: ['draftGrade'],
     shouldPatch: true
   })
+})
+
+test('createGoogleClient accepts a direct GOOGLE_ACCESS_TOKEN', async () => {
+  const originalFetch = global.fetch
+  const originalAccessToken = process.env.GOOGLE_ACCESS_TOKEN
+  const originalClientId = process.env.GOOGLE_CLIENT_ID
+  const originalClientSecret = process.env.GOOGLE_CLIENT_SECRET
+  const originalRefreshToken = process.env.GOOGLE_REFRESH_TOKEN
+
+  process.env.GOOGLE_ACCESS_TOKEN = 'test-access-token'
+  delete process.env.GOOGLE_CLIENT_ID
+  delete process.env.GOOGLE_CLIENT_SECRET
+  delete process.env.GOOGLE_REFRESH_TOKEN
+
+  let authorizationHeader = null
+  global.fetch = async (_url, init = {}) => {
+    authorizationHeader = init.headers?.Authorization || null
+    return new Response(JSON.stringify({ courses: [] }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
+    })
+  }
+
+  try {
+    const client = await createGoogleClient()
+    const response = await client.request('/v1/courses')
+
+    assert.equal(authorizationHeader, 'Bearer test-access-token')
+    assert.deepEqual(response, { courses: [] })
+  } finally {
+    global.fetch = originalFetch
+    if (originalAccessToken === undefined) delete process.env.GOOGLE_ACCESS_TOKEN
+    else process.env.GOOGLE_ACCESS_TOKEN = originalAccessToken
+    if (originalClientId === undefined) delete process.env.GOOGLE_CLIENT_ID
+    else process.env.GOOGLE_CLIENT_ID = originalClientId
+    if (originalClientSecret === undefined) delete process.env.GOOGLE_CLIENT_SECRET
+    else process.env.GOOGLE_CLIENT_SECRET = originalClientSecret
+    if (originalRefreshToken === undefined) delete process.env.GOOGLE_REFRESH_TOKEN
+    else process.env.GOOGLE_REFRESH_TOKEN = originalRefreshToken
+  }
 })

@@ -8,15 +8,20 @@ let cachedAccessToken = null
 let cachedAccessTokenExpiresAt = 0
 
 export async function createGoogleClient() {
+  const accessToken = process.env.GOOGLE_ACCESS_TOKEN
   const clientId = process.env.GOOGLE_CLIENT_ID
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET
   const refreshToken = process.env.GOOGLE_REFRESH_TOKEN
 
-  if (!clientId || !clientSecret || !refreshToken) {
-    throw new Error('Missing GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, or GOOGLE_REFRESH_TOKEN')
-  }
-
   async function getAccessToken() {
+    if (accessToken) {
+      return accessToken
+    }
+
+    if (!clientId || !clientSecret || !refreshToken) {
+      throw new Error('Missing GOOGLE_ACCESS_TOKEN or GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, and GOOGLE_REFRESH_TOKEN')
+    }
+
     if (cachedAccessToken && Date.now() < cachedAccessTokenExpiresAt - 30_000) {
       return cachedAccessToken
     }
