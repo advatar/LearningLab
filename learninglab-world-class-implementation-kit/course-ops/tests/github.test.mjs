@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { assertRepositoryReusable, getCollaboratorPermission } from '../src/lib/github.mjs'
+import { addCollaborator, assertRepositoryReusable, getCollaboratorPermission } from '../src/lib/github.mjs'
 
 test('assertRepositoryReusable accepts a matching repository with expected visibility', () => {
   const repository = assertRepositoryReusable(
@@ -55,4 +55,24 @@ test('getCollaboratorPermission returns null for missing collaborators', async (
   })
 
   assert.equal(permission, null)
+})
+
+test('addCollaborator skips the repo owner on self-owned pilot repos', async () => {
+  let called = false
+  const client = {
+    async request() {
+      called = true
+      return {}
+    }
+  }
+
+  const result = await addCollaborator(client, {
+    owner: 'advatar',
+    repo: 'learninglab-pilot-lab-01-issuance-advatar',
+    username: 'advatar',
+    permission: 'push'
+  })
+
+  assert.equal(called, false)
+  assert.deepEqual(result, { action: 'skipped_owner' })
 })

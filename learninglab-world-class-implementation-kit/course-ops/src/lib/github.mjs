@@ -124,6 +124,10 @@ export async function getRepositoryVariable(client, { owner, repo, name }) {
 }
 
 export async function addCollaborator(client, { owner, repo, username, permission = 'push' }) {
+  if (String(owner).toLowerCase() === String(username).toLowerCase()) {
+    return { action: 'skipped_owner' }
+  }
+
   try {
     await client.request(`/repos/${owner}/${repo}/collaborators/${username}`, {
       method: 'PUT',
