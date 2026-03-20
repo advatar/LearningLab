@@ -123,6 +123,14 @@ Booth operation notes:
 - Set `DEMO_CONDUCTOR_AUTH_SECRET` to a stable random secret so signed auth cookies survive restarts cleanly
 - With Google login enabled, each signed-in user gets isolated conductor state, but issuer/verifier child processes and relay mode are still shared singleton resources on the host
 
+## Wallet forks
+
+The mobile wallet source stays in separate iOS and Android forks beside `LearningLab`. Do not add them as submodules and do not clone them inside this repo.
+
+- Setup helper: `node scripts/setup-wallet-forks.js`
+- Student/instructor workflow: [WALLET_FORKS.md](/Users/johansellstrom/dev/iproov/RSA/LearningLab/WALLET_FORKS.md)
+- Demo-flow guardrail: the browser-based `demo-conductor` path remains the existing demo path and must keep working even while wallet integrations evolve
+
 ## Lab tracks (step-by-step)
 - Lab 00: labs/README-lab-00-start.md
 - Lab 01: labs/README-lab-01-issuance.md
