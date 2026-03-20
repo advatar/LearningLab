@@ -130,6 +130,7 @@ The mobile wallet source stays in separate iOS and Android forks beside `Learnin
 - Setup helper: `node scripts/setup-wallet-forks.js`
 - Student/instructor workflow: [WALLET_FORKS.md](/Users/johansellstrom/dev/iproov/RSA/LearningLab/WALLET_FORKS.md)
 - Demo-flow guardrail: the browser-based `demo-conductor` path remains the existing demo path and must keep working even while wallet integrations evolve
+- iOS native path: use the official iProov iOS SDK on a physical iPhone when real iProov credentials are configured; keep the demo-mode callback fallback for simulator/lab work
 
 ## Lab tracks (step-by-step)
 - Lab 00: labs/README-lab-00-start.md

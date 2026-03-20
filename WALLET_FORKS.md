@@ -60,21 +60,52 @@ Students should:
 4. Point the wallet at the local `issuer` and `verifier` services.
 5. Treat wallet iProov support as an advanced/mobile track. The web demo path is separate and must not be used as the mobile integration point.
 
+## Student baseline
+
+Students should receive a wallet fork where the iProov plumbing already exists.
+
+- iOS:
+  - real iProov credentials + physical iPhone: use the official native iProov iOS SDK
+  - demo mode: use the wallet-launched web fallback from `POST /iproov/mobile/claim`
+- Android:
+  - keep the current wallet gate additive and separate from the browser demo flow
+
+Students should only need to:
+
+1. run `issuer` and `verifier`
+2. set the wallet issuer URL
+3. understand where the iProov gate sits in the presentation flow
+4. test the flow on a simulator in demo mode or on a real device for native iProov
+
 ## iProov integration points
 
-Use these hook points in the wallet forks so iProov runs immediately before a presentation leaves the wallet:
+Use these hook points so iProov runs immediately before a presentation leaves the wallet:
 
 - iOS: `Modules/feature-presentation/Sources/UI/Presentation/Loading/PresentationLoadingViewModel.swift`
   - gate `interactor.onSendResponse()`
 - Android: `presentation-feature/src/main/java/eu/europa/ec/presentationfeature/ui/loading/PresentationLoadingViewModel.kt`
   - gate `sendRequestedDocuments()`
 
-Expected sequence:
+Expected iOS sequence:
 
-1. Wallet requests a claim token from `POST /iproov/claim`.
-2. Wallet launches the native iProov SDK.
-3. Wallet blocks presentation until the iProov result is accepted.
-4. Wallet continues with the normal presentation flow.
+1. Wallet calls `GET /iproov/config`.
+2. If `realCeremonyEnabled=true`, the wallet calls `GET /iproov/claim`.
+3. Wallet launches the official iProov iOS SDK with the returned `token` and `streamingURL`.
+4. On native success, the wallet calls `POST /iproov/validate` with the `session`.
+5. Only then does the wallet continue with the normal presentation flow.
+
+Expected iOS demo fallback:
+
+1. Wallet calls `POST /iproov/mobile/claim` with callback URL `eudi-wallet://iproov`.
+2. Wallet opens the returned `launchUrl`.
+3. The issuer-hosted page completes the demo ceremony and redirects back into the wallet.
+4. Wallet confirms the returned `session` through `GET /iproov/session/:session`.
+5. Only then does the wallet continue with the normal presentation flow.
+
+Important:
+
+- the official iProov iOS SDK does not run in the simulator; use a physical iPhone for the native path
+- the browser-based `demo-conductor` path remains the booth/demo flow and must continue to work unchanged
 
 ## Student deliverable boundary
 

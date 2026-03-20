@@ -1091,8 +1091,11 @@ function hasRealIproovConfig() {
 }
 
 function normalizeIproovCeremonyBaseUrl(raw: string | undefined) {
-  const base = String(raw || '').trim() || 'https://eu.rp.iproov.me'
-  return base.replace(/\/api\/v2\/?$/, '').replace(/\/+$/, '')
+  const base = String(raw || '').trim() || 'https://eu.rp.secure.iproov.me'
+  return base
+    .replace(/\/api\/v2\/?$/, '')
+    .replace(/\/+$/, '')
+    .replace(/^(https?:\/\/)([a-z0-9-]+\.rp)\.iproov\.me(?=\/|$)/i, '$1$2.secure.iproov.me')
 }
 
 function getSharedRuntime(repoRoot: string): SharedRuntime {

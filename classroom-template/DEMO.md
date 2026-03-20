@@ -95,14 +95,14 @@ Why: bind “holder is present & is the right person” without storing biometri
 Swift (wallet) sketch:
 
 ```swift
-import IProov
+import iProov
 
-func runIProov(token: String, onResult: @escaping (Bool) -> Void) {
-  IProov.launch(streamingURL: URL(string: token)!) { event in
+func runIProov(token: String, streamingURL: URL, onResult: @escaping (Bool) -> Void) {
+  IProov.launch(streamingURL: streamingURL, token: token) { event in
     switch event {
-    case .success(_):
+    case .success:
       onResult(true) // server should double‑check via webhook/validate API
-    case .failure(_):
+    case .failure:
       onResult(false)
     default:
       break
@@ -237,7 +237,7 @@ Why: the origin cannot link requests to a client/IP — crucial to avoid correla
 ISSUER_SIGNING_KEY=...
 STATUS_LIST_URL=https://example.com/statuslist/1.json
 USE_OHTTP=true
-IPROOV_BASE_URL=https://eu.rp.iproov.me
+IPROOV_BASE_URL=https://eu.rp.secure.iproov.me
 IPROOV_API_KEY=...
 
 # verifier/

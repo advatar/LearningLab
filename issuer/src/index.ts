@@ -18,6 +18,11 @@ import {
 } from 'jose'
 import { z } from 'zod'
 import { base64ToBytes, bytesToBase64, deriveProof, generateBbsKeypair, signMessages } from 'bbs-lib'
+import {
+  buildIProovMobileLaunchUrl,
+  parseIProovMobileCallbackUrl,
+  renderIProovMobilePage
+} from './iproov-mobile.js'
 import { requestEnrolToken, resolveIProovConfig, validateEnrolToken } from './iproov.js'
 
 dotenv.config()
@@ -412,53 +417,79 @@ app.get('/iproov/config', (_req: Request, res: Response) => {
 })
 
 app.get('/iproov/claim', async (_req: Request, res: Response) => {
-  const session = crypto.randomUUID()
-
-  if (IPROOV.realCeremonyEnabled) {
-    try {
-      const tokenResponse = await requestEnrolToken(IPROOV, { userId: session })
-      iproovSessions.set(session, {
-        passed: false,
-        mode: 'real',
-        userId: session,
-        token: tokenResponse.token,
-        validatedAt: null,
-        failureReason: null,
-        signals: null
-      })
-      return res.json({
-        session,
-        mode: 'real',
-        token: tokenResponse.token,
-        baseUrl: IPROOV.ceremonyBaseUrl,
-        sdkScriptUrl: IPROOV.sdkScriptUrl,
-        note: 'Launch the iProov web SDK, then call /iproov/validate before the BBS+ disclosure is verified.'
-      })
-    } catch (error: any) {
-      console.error('[issuer] iProov enrol token error', error)
-      return res.status(502).json({
-        error: 'iproov_claim_failed',
-        message: error?.message || 'Unable to create iProov enrol token'
-      })
-    }
+  try {
+    res.json(await createIProovClaim())
+  } catch (error: any) {
+    console.error('[issuer] iProov enrol token error', error)
+    res.status(502).json({
+      error: 'iproov_claim_failed',
+      message: error?.message || 'Unable to create iProov enrol token'
+    })
   }
+})
 
-  iproovSessions.set(session, {
-    passed: false,
-    mode: 'demo',
-    userId: session,
-    token: null,
-    validatedAt: null,
-    failureReason: null,
-    signals: null
-  })
-  return res.json({
-    session,
-    mode: 'demo',
-    token: IPROOV.passToken,
-    streamingURL: `${IPROOV.passToken}:${session}`,
-    note: 'In demo mode, the webhook must mark this session as passed before BBS+ disclosure verification.'
-  })
+app.post('/iproov/mobile/claim', async (req: Request, res: Response) => {
+  try {
+    const body = z
+      .object({
+        callback_url: z.string()
+      })
+      .parse(req.body || {})
+
+    const callbackUrl = parseIProovMobileCallbackUrl(body.callback_url)
+    const claim = await createIProovClaim()
+
+    return res.json({
+      ...claim,
+      callbackUrl,
+      launchUrl: buildIProovMobileLaunchUrl({
+        issuerBaseUrl: BASE_URL,
+        callbackUrl,
+        session: claim.session
+      }),
+      note: 'Open launchUrl in the wallet browser flow, complete iProov, then resume presentation after the callback returns.'
+    })
+  } catch (error: any) {
+    const message = error?.message || 'Unable to prepare the mobile iProov launch URL'
+    const status = message.includes('callback_url') ? 400 : 502
+    if (status >= 500) {
+      console.error('[issuer] iProov mobile claim error', error)
+    }
+    return res.status(status).json({
+      error: status === 400 ? 'invalid_callback_url' : 'iproov_mobile_claim_failed',
+      message
+    })
+  }
+})
+
+app.get('/iproov/mobile/start', (req: Request, res: Response) => {
+  try {
+    const callbackUrl = parseIProovMobileCallbackUrl(req.query.callback_url)
+    const session = String(req.query.session || '').trim()
+    if (!session) {
+      return res.status(400).send('Missing session')
+    }
+
+    const sessionState = iproovSessions.get(session)
+    if (!sessionState) {
+      return res.status(404).send('Unknown iProov session')
+    }
+
+    const html = renderIProovMobilePage({
+      session,
+      callbackUrl,
+      validateUrl: `${BASE_URL}/iproov/validate`,
+      webhookUrl: `${BASE_URL}/iproov/webhook`,
+      sdkScriptUrl: IPROOV.sdkScriptUrl,
+      ceremonyBaseUrl: IPROOV.ceremonyBaseUrl,
+      token: sessionState.token,
+      mode: sessionState.mode
+    })
+
+    return res.setHeader('content-type', 'text/html; charset=utf-8').status(200).send(html)
+  } catch (error: any) {
+    return res.status(400).send(error?.message || 'Unable to start the mobile iProov ceremony')
+  }
 })
 
 app.get('/iproov/session/:session', (req: Request, res: Response) => {
@@ -557,6 +588,49 @@ app.listen(PORT, () => {
 })
 
 // --- helpers ---
+
+async function createIProovClaim() {
+  const session = crypto.randomUUID()
+
+  if (IPROOV.realCeremonyEnabled) {
+    const tokenResponse = await requestEnrolToken(IPROOV, { userId: session })
+    iproovSessions.set(session, {
+      passed: false,
+      mode: 'real',
+      userId: session,
+      token: tokenResponse.token,
+      validatedAt: null,
+      failureReason: null,
+      signals: null
+    })
+    return {
+      session,
+      mode: 'real' as const,
+      token: tokenResponse.token,
+      streamingURL: IPROOV.streamingUrl,
+      baseUrl: IPROOV.ceremonyBaseUrl,
+      sdkScriptUrl: IPROOV.sdkScriptUrl,
+      note: 'Launch the iProov SDK or web SDK, then call /iproov/validate before the BBS+ disclosure is verified.'
+    }
+  }
+
+  iproovSessions.set(session, {
+    passed: false,
+    mode: 'demo',
+    userId: session,
+    token: null,
+    validatedAt: null,
+    failureReason: null,
+    signals: null
+  })
+  return {
+    session,
+    mode: 'demo' as const,
+    token: IPROOV.passToken,
+    streamingURL: `${IPROOV.passToken}:${session}`,
+    note: 'In demo mode, the webhook must mark this session as passed before BBS+ disclosure verification.'
+  }
+}
 
 async function issueSdJwt(
   subject: string,

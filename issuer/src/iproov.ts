@@ -5,6 +5,7 @@ type RequestLike = typeof fetch
 export type IProovConfig = {
   apiBaseUrl: string
   ceremonyBaseUrl: string
+  streamingUrl: string
   apiKey: string | null
   secret: string | null
   resource: string
@@ -26,12 +27,13 @@ export type IProovValidationResult = {
   frameAvailable?: boolean
 }
 
-const DEFAULT_API_BASE_URL = 'https://eu.rp.iproov.me/api/v2'
+const DEFAULT_API_BASE_URL = 'https://eu.rp.secure.iproov.me/api/v2'
 const DEFAULT_SDK_SCRIPT_URL = 'https://cdn.jsdelivr.net/npm/@iproov/web'
 
 export function resolveIProovConfig(env: EnvSource): IProovConfig {
   const apiBaseUrl = normalizeIProovApiBaseUrl(env.IPROOV_BASE_URL)
   const ceremonyBaseUrl = normalizeIProovCeremonyBaseUrl(env.IPROOV_BASE_URL)
+  const streamingUrl = normalizeIProovStreamingUrl(env.IPROOV_BASE_URL)
   const apiKey = clean(env.IPROOV_API_KEY)
   const secret = clean(env.IPROOV_SECRET) || clean(env.IPROOV_MANAGEMENT_KEY)
   const resource = clean(env.IPROOV_RESOURCE) || clean(env.ISSUER_BASE_URL) || 'learninglab-demo-conductor'
@@ -43,6 +45,7 @@ export function resolveIProovConfig(env: EnvSource): IProovConfig {
   return {
     apiBaseUrl,
     ceremonyBaseUrl,
+    streamingUrl,
     apiKey,
     secret,
     resource,
@@ -55,14 +58,24 @@ export function resolveIProovConfig(env: EnvSource): IProovConfig {
 }
 
 export function normalizeIProovApiBaseUrl(raw: string | undefined) {
-  const value = clean(raw) || DEFAULT_API_BASE_URL
-  const trimmed = value.replace(/\/+$/, '')
-  return trimmed.endsWith('/api/v2') ? trimmed : `${trimmed}/api/v2`
+  return `${normalizeIProovCeremonyBaseUrl(raw)}/api/v2`
 }
 
 export function normalizeIProovCeremonyBaseUrl(raw: string | undefined) {
-  const apiBaseUrl = normalizeIProovApiBaseUrl(raw)
-  return apiBaseUrl.replace(/\/api\/v2$/, '')
+  const value = clean(raw) || DEFAULT_API_BASE_URL
+  const trimmed = value.replace(/\/+$/, '').replace(/\/api\/v2$/, '')
+  return normalizeLegacyIProovHost(trimmed)
+}
+
+export function normalizeIProovStreamingUrl(raw: string | undefined) {
+  const baseUrl = normalizeIProovCeremonyBaseUrl(raw)
+  if (baseUrl.startsWith('https://')) {
+    return `${baseUrl.replace(/^https:\/\//, 'wss://')}/ws`
+  }
+  if (baseUrl.startsWith('http://')) {
+    return `${baseUrl.replace(/^http:\/\//, 'ws://')}/ws`
+  }
+  return `${baseUrl}/ws`
 }
 
 export async function requestEnrolToken(
@@ -187,4 +200,8 @@ function readIProovError(data: Record<string, any> | null) {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value)
+}
+
+function normalizeLegacyIProovHost(value: string) {
+  return value.replace(/^(https?:\/\/)([a-z0-9-]+\.rp)\.iproov\.me(?=\/|$)/i, '$1$2.secure.iproov.me')
 }

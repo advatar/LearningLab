@@ -20,7 +20,7 @@ Steps (edit + test)
 3) Wallet hook (Swift)
    - In `wallet-ios/README.md` (or Swift patch files), add the snippet:
      ```
-     IProov.launch(streamingURL: URL(string: token)!) { event in
+     IProov.launch(streamingURL: URL(string: claim.streamingURL)!, token: claim.token) { event in
        switch event { case .success(_): onResult(true); case .failure(_): onResult(false); default: break }
      }
      ```

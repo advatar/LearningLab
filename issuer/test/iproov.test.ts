@@ -3,6 +3,7 @@ import test from 'node:test'
 import {
   normalizeIProovApiBaseUrl,
   normalizeIProovCeremonyBaseUrl,
+  normalizeIProovStreamingUrl,
   requestEnrolToken,
   resolveIProovConfig,
   validateEnrolToken
@@ -16,8 +17,9 @@ test('resolveIProovConfig normalizes urls and falls back to management key', () 
     ISSUER_BASE_URL: 'https://issuer.example.com'
   })
 
-  assert.equal(config.apiBaseUrl, 'https://eu.rp.iproov.me/api/v2')
-  assert.equal(config.ceremonyBaseUrl, 'https://eu.rp.iproov.me')
+  assert.equal(config.apiBaseUrl, 'https://eu.rp.secure.iproov.me/api/v2')
+  assert.equal(config.ceremonyBaseUrl, 'https://eu.rp.secure.iproov.me')
+  assert.equal(config.streamingUrl, 'wss://eu.rp.secure.iproov.me/ws')
   assert.equal(config.secret, 'management-secret')
   assert.equal(config.resource, 'https://issuer.example.com')
   assert.equal(config.sdkScriptUrl, 'https://cdn.jsdelivr.net/npm/@iproov/web')
@@ -38,9 +40,10 @@ test('resolveIProovConfig ignores placeholder secrets and keeps demo mode disabl
 })
 
 test('normalizeIProov base url helpers accept raw platform or api urls', () => {
-  assert.equal(normalizeIProovApiBaseUrl('https://eu.rp.iproov.me/api/v2/'), 'https://eu.rp.iproov.me/api/v2')
-  assert.equal(normalizeIProovApiBaseUrl('https://eu.rp.iproov.me'), 'https://eu.rp.iproov.me/api/v2')
-  assert.equal(normalizeIProovCeremonyBaseUrl('https://eu.rp.iproov.me/api/v2/'), 'https://eu.rp.iproov.me')
+  assert.equal(normalizeIProovApiBaseUrl('https://eu.rp.iproov.me/api/v2/'), 'https://eu.rp.secure.iproov.me/api/v2')
+  assert.equal(normalizeIProovApiBaseUrl('https://eu.rp.iproov.me'), 'https://eu.rp.secure.iproov.me/api/v2')
+  assert.equal(normalizeIProovCeremonyBaseUrl('https://eu.rp.iproov.me/api/v2/'), 'https://eu.rp.secure.iproov.me')
+  assert.equal(normalizeIProovStreamingUrl('https://eu.rp.iproov.me'), 'wss://eu.rp.secure.iproov.me/ws')
 })
 
 test('requestEnrolToken posts the expected payload', async () => {
@@ -60,7 +63,7 @@ test('requestEnrolToken posts the expected payload', async () => {
     })
   })
 
-  assert.equal(url, 'https://eu.rp.iproov.me/api/v2/claim/enrol/token')
+  assert.equal(url, 'https://eu.rp.secure.iproov.me/api/v2/claim/enrol/token')
   assert.match(body, /"user_id":"user-123"/)
   assert.match(body, /"assurance_type":"genuine_presence"/)
   assert.equal(response.token, 'enrol-token')
