@@ -117,3 +117,13 @@
 - [ ] Resolve the transient Android dependency download failures and rerun the wallet tests locally
 - [ ] Verify the wallet fork workflow and wallet integrations locally
 - [x] Commit the wallet fork workflow updates
+- [x] Run the lesson test sweep for labs 00-05
+- [x] Record the lesson test sweep results
+
+Lesson sweep results
+- Lab 00: pass
+- Lab 01: pass
+- Lab 02: fail because the verifier now requires an iProov session for BBS+ disclosure verification
+- Lab 03: pass
+- Lab 04: fail because issuance is no longer blocked on iProov before `/credential`
+- Lab 05: pass
