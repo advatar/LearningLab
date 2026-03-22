@@ -4,6 +4,36 @@ Branch: `lab-00-start` · Timebox: 10 minutes
 
 Goal: get the scaffold running, env files in place, and verify the expected 501 stubs before coding.
 
+## What This Lab Is Doing
+
+This lab is not about implementing a feature yet. It is about orienting students to the system boundary:
+
+- `issuer/` will eventually mint credentials
+- `verifier/` will eventually validate presentations
+- `bbs-lib/` holds the selective-disclosure cryptography used later
+
+The important teaching point is that the repo already has the shape of the final system, but the main feature endpoints are still stubs. Students should see the system boot, inspect the metadata, and prove to themselves that later labs really do add behavior step by step.
+
+## Flow Overview
+
+```mermaid
+flowchart LR
+    Student[Student Terminal] -->|start dev servers| Issuer[Issuer :3001]
+    Student -->|start dev servers| Verifier[Verifier :3002]
+    Student -->|GET issuer metadata| Issuer
+    Student -->|POST credential-offers/token/credential| Issuer
+    Student -->|POST verify| Verifier
+    Issuer -->|returns 501 for lab stubs| Student
+    Verifier -->|returns 501 for lab stubs| Student
+```
+
+## What Students Should Understand
+
+- there are two main services, not one
+- issuer metadata can exist before issuance is implemented
+- the lab starts from a deliberately incomplete scaffold
+- later labs will replace the `501 Not Implemented` responses with real VC flows
+
 Prereqs
 - Node.js 20.x, pnpm installed.
 - This branch checked out (`git checkout lab-00-start`).

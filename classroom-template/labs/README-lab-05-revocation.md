@@ -4,6 +4,46 @@ Branch: `lab-05-revocation` · Timebox: 20 minutes
 
 Goal: embed credential status in issued VCs and have the verifier check a Bitstring Status List (via OHTTP if enabled).
 
+## What This Lab Is Doing
+
+This lab completes the lifecycle by adding revocation. A credential may still be well-formed and correctly signed, but it may no longer be acceptable. Students add a privacy-preserving status mechanism so the verifier can detect revocation without the issuer needing to answer a per-credential online query.
+
+The model is:
+
+1. issuer assigns each credential a status list index
+2. issuer serves a bitstring status list document
+3. verifier reads the relevant bit at verification time
+4. revocation flips the bit instead of deleting or rewriting the credential
+
+This is the final step that makes the credential system feel operational rather than purely academic.
+
+## Flow Overview
+
+```mermaid
+sequenceDiagram
+    participant Holder as Holder
+    participant Issuer
+    participant Verifier
+    participant StatusList as Status List
+
+    Issuer-->>Holder: credential + credentialStatus(index, list URL)
+    Holder->>Verifier: present credential
+    Verifier->>StatusList: fetch status list
+    StatusList-->>Verifier: bitstring data
+    Verifier-->>Holder: accept if bit is not revoked
+    Issuer->>StatusList: flip bit on /revoke/:id
+    Holder->>Verifier: present same credential again
+    Verifier->>StatusList: fetch or refresh status list
+    Verifier-->>Holder: reject if bit is revoked
+```
+
+## What Students Should Understand
+
+- revocation is checked at verification time, not encoded only at issuance time
+- the verifier needs both the credential and the current status list state
+- a bitstring status list is more privacy-preserving than a direct “is credential X revoked?” lookup
+- this lab builds on the issuance work from Labs 01 and 02 rather than replacing it
+
 Prereqs
 - Checkout branch: `git checkout lab-05-revocation`.
 - Env ready: `pnpm env:setup`; set `STATUS_LIST_ID` as needed.

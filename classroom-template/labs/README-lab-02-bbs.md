@@ -4,6 +4,43 @@ Branch: `lab-02-bbs` · Timebox: 25 minutes
 
 Goal: issue DI+BBS credentials and verify unlinkable proofs revealing only selected claims.
 
+## What This Lab Is Doing
+
+This lab shifts from plain issuance to privacy-preserving presentation. The issuer still signs a credential, but the holder does not send the whole thing to the verifier. Instead, the holder derives a new BBS+ proof that reveals only the claims requested for the relying party.
+
+The mental model for students should be:
+
+1. issuer signs a fixed ordered list of messages
+2. holder chooses which message indexes to reveal
+3. holder derives a proof that is valid for those revealed messages only
+4. verifier checks the proof without learning the hidden messages
+
+That fixed message order is crucial. If the holder and verifier disagree on message ordering, proof verification fails.
+
+## Flow Overview
+
+```mermaid
+sequenceDiagram
+    participant Holder as Holder / Student Script
+    participant Issuer
+    participant Verifier
+
+    Holder->>Issuer: POST /credential format=di-bbs
+    Issuer-->>Holder: BBS credential + ordered messages + signature
+    Holder->>Issuer: POST /bbs/proof with reveal indexes
+    Issuer-->>Holder: derived proof + revealed messages
+    Holder->>Verifier: POST /verify with BBS proof
+    Verifier->>Issuer: GET /.well-known/bbs-public-key
+    Verifier-->>Holder: proof valid for revealed claims only
+```
+
+## What Students Should Understand
+
+- BBS+ is about selective disclosure, not just another signature format
+- the full credential and the presentation proof are different artifacts
+- nonce changes make proofs unlinkable across presentations
+- reveal indexes and message order are part of the cryptographic contract
+
 Prereqs
 - Checkout branch: `git checkout lab-02-bbs`.
 - Env ready: `pnpm env:setup`.

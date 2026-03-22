@@ -4,6 +4,30 @@ Branch: `lab-03-ohttp` · Timebox: 20 minutes
 
 Goal: route issuer and verifier calls through an OHTTP relay so servers never see client IPs.
 
+## What This Lab Is Doing
+
+This lab does not introduce a new credential type. It changes the network privacy model around the existing system. Instead of letting issuer and verifier make direct outbound requests, students route those requests through an Oblivious HTTP relay.
+
+The key teaching point is that credential privacy is not only about cryptography. It is also about metadata. Even if payloads are privacy-preserving, direct outbound calls can still leak who is talking to whom by IP address.
+
+## Flow Overview
+
+```mermaid
+flowchart LR
+    Issuer[Issuer] -->|outbound fetch via relay| Relay[OHTTP Relay]
+    Verifier[Verifier] -->|outbound fetch via relay| Relay
+    Relay --> JWKS[JWKS / remote issuer metadata]
+    Relay --> Status[Status list / remote resource]
+    Relay --> Other[Other remote endpoints]
+```
+
+## What Students Should Understand
+
+- OHTTP changes transport privacy, not VC semantics
+- the relay sits between our services and the remote resources they fetch
+- issuer and verifier logic should still work when the relay is turned off
+- this lab is mostly about correctly respecting environment-driven fetch behavior
+
 Prereqs
 - Checkout branch: `git checkout lab-03-ohttp`.
 - Env ready with relay URL placeholders: `pnpm env:setup`.

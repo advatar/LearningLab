@@ -4,6 +4,44 @@ Branch: `lab-01-issuance` · Timebox: 20 minutes
 
 Goal: implement offer → token → credential for SD-JWT VCs so the verifier can see issued claims.
 
+## What This Lab Is Doing
+
+This lab introduces the first real credential lifecycle. Students are building the issuer-side OIDC4VCI flow for pre-authorized issuance and the verifier-side SD-JWT validation flow.
+
+Conceptually, three things happen:
+
+1. the issuer creates an offer and a one-time pre-authorized code
+2. the holder exchanges that code for an access token and `c_nonce`
+3. the holder proves possession of the `c_nonce`, receives an SD-JWT credential, and sends it to the verifier
+
+The `c_nonce` matters because it binds the issuance request to a fresh proof and prevents replay of stale requests.
+
+## Flow Overview
+
+```mermaid
+sequenceDiagram
+    participant Holder as Holder / Student Script
+    participant Issuer
+    participant Verifier
+
+    Holder->>Issuer: POST /credential-offers
+    Issuer-->>Holder: credential_offer + pre-authorized code
+    Holder->>Issuer: POST /token
+    Issuer-->>Holder: access_token + c_nonce
+    Holder->>Issuer: POST /credential with proof.jwt(nonce=c_nonce)
+    Issuer-->>Holder: SD-JWT credential
+    Holder->>Verifier: POST /verify
+    Verifier->>Issuer: fetch JWKS
+    Verifier-->>Holder: verified claims
+```
+
+## What Students Should Understand
+
+- issuance is a multi-step protocol, not a single POST
+- the token endpoint and credential endpoint have different jobs
+- SD-JWT lets the issuer sign claims while the verifier later checks disclosed values against hashes
+- the verifier is validating both issuer signature material and disclosure integrity
+
 Prereqs
 - Checkout branch: `git checkout lab-01-issuance`.
 - Env ready: `pnpm env:setup` (leave defaults).

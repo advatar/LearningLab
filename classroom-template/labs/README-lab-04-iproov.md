@@ -4,6 +4,44 @@ Branch: `lab-04-iproov` · Timebox: 20 minutes
 
 Goal: require a successful iProov verification before releasing/presenting credentials.
 
+## What This Lab Is Doing
+
+This lab adds a liveness gate to the credential flow. Up to this point, the system checks whether a credential is structurally valid. In this lab, students add a policy decision: do not issue or release the credential flow until the subject has passed an iProov ceremony.
+
+There are two moving parts:
+
+1. a claim/session endpoint that starts the iProov ceremony
+2. a webhook or validation result that marks the session as passed
+
+Only after both exist can the issuer or wallet enforce the gate.
+
+## Flow Overview
+
+```mermaid
+sequenceDiagram
+    participant Holder as Holder / Wallet
+    participant Issuer
+    participant IProov
+    participant Verifier
+
+    Holder->>Issuer: request credential or presentation
+    Issuer-->>Holder: liveness required
+    Holder->>Issuer: GET /iproov/claim
+    Issuer->>IProov: create session / token
+    IProov-->>Holder: ceremony
+    IProov-->>Issuer: webhook / validation result
+    Issuer-->>Holder: session marked passed
+    Holder->>Issuer: retry issuance / release flow
+    Holder->>Verifier: continue with normal credential flow
+```
+
+## What Students Should Understand
+
+- iProov is a gate in front of the VC flow, not a replacement for the VC flow
+- session state must be persisted somewhere so later requests can see the pass result
+- the ceremony step and the policy decision step are separate
+- demo mode and real mode can share the same control flow even if the underlying ceremony differs
+
 Prereqs
 - Checkout branch: `git checkout lab-04-iproov`.
 - iProov sandbox credentials available (use placeholders if demoing).

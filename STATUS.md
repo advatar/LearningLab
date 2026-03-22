@@ -143,3 +143,6 @@ Wallet verification notes
 - [x] Add source annotations around LAB_ID compatibility and iProov enforcement in issuer and verifier
 - [x] Verify builds locally after the documentation and annotation updates
 - [x] Commit the teaching documentation updates
+- [x] Add concept-first explanations to each lesson README
+- [x] Add Mermaid diagrams to each lesson README to show the flow being built
+- [x] Verify the repo builds cleanly after the lesson README updates
