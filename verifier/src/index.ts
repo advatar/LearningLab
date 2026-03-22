@@ -1,4 +1,10 @@
 // Lab 05: SD-JWT + BBS verifier with OHTTP, revocation, and BBS disclosure-time iProov checks.
+//
+// Important teaching note:
+// - with no LAB_ID, this file represents the final integrated verifier policy
+// - with LAB_ID set, it can temporarily relax or restore lesson-specific checks
+// - Lab 02 compatibility is intentionally narrow so the classroom can focus on
+//   pure BBS+ proof verification without changing the default integrated flow
 import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
@@ -24,6 +30,7 @@ const USE_OHTTP = String(process.env.USE_OHTTP || 'false') === 'true'
 const OHTTP_RELAY_URL = process.env.OHTTP_RELAY_URL || ''
 const STATUS_LIST_ID = process.env.STATUS_LIST_ID || '1'
 const STATUS_LIST_URL = process.env.STATUS_LIST_URL || `${ISSUER_BASE_URL}/statuslist/${STATUS_LIST_ID}.json`
+// LAB_ID is injected by the lesson runner. Normal integrated runs leave it unset.
 const ACTIVE_LAB_ID = process.env.LAB_ID
 
 let lastPresentation: any = null
@@ -109,6 +116,9 @@ async function verifyBbsPresentation(body: any) {
     throw new Error('invalid_proof')
   }
   const session = typeof body?.iproov_session === 'string' ? body.iproov_session.trim() : ''
+  // Final integrated mode expects an iProov session before BBS disclosure
+  // verification. LAB_ID=02 disables that single requirement so the student can
+  // complete the BBS lesson without first wiring the liveness flow.
   if (!session && shouldRequireIProovForBbsVerification(ACTIVE_LAB_ID)) {
     throw new Error('Complete the iProov ceremony before verifying the BBS+ disclosure')
   }

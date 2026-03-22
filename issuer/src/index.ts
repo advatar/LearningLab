@@ -1,4 +1,11 @@
 // Lab 05: SD-JWT + BBS issuer with OHTTP toggle, iProov session state, and Bitstring Status List revocation.
+//
+// Important teaching note:
+// - with no LAB_ID, this file represents the final integrated runtime on `main`
+// - with LAB_ID set by `scripts/lab-check.js` or GitHub Classroom, it can
+//   temporarily restore lesson-specific behavior without changing the final flow
+// - demo-conductor and wallet work must stay additive; lesson compatibility must
+//   never become the default runtime behavior
 import express from 'express'
 import type { Request, Response } from 'express'
 import cors from 'cors'
@@ -39,6 +46,8 @@ const STATUS_LIST_ID = process.env.STATUS_LIST_ID || '1'
 const USE_OHTTP = String(process.env.USE_OHTTP || 'false') === 'true'
 const OHTTP_RELAY_URL = process.env.OHTTP_RELAY_URL || ''
 const IPROOV = resolveIProovConfig(process.env)
+// LAB_ID is only used to make the integrated branch behave like earlier lesson
+// checkpoints when the classroom runner explicitly asks for that behavior.
 const ACTIVE_LAB_ID = process.env.LAB_ID
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN?.trim()
 const STATUS_LIST_SIZE_BITS = Number(process.env.STATUS_LIST_SIZE_BITS || 8192)
@@ -290,6 +299,9 @@ app.post('/credential', async (req: Request, res: Response) => {
 
   const iproovSession = body.iproov_session?.trim() || ''
   const iproovSessionState = iproovSession ? iproovSessions.get(iproovSession) : null
+  // Final integrated mode does not block all issuance on iProov by default.
+  // LAB_ID=04 temporarily restores issuance-time gating so students can learn
+  // the liveness step without also needing the later BBS disclosure policy.
   const iproovDecision = evaluateCredentialIssuanceIProovGate({
     labId: ACTIVE_LAB_ID,
     providedSession: Boolean(iproovSession),

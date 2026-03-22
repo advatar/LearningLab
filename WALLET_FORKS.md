@@ -2,6 +2,8 @@
 
 The mobile wallet work lives in separate git repositories. Do not add the wallets to `LearningLab` as submodules and do not clone them inside this repo.
 
+Detailed student-facing setup and troubleshooting lives in [STUDENT_WALLET_RUNBOOK.md](/Users/johansellstrom/dev/iproov/RSA/LearningLab/STUDENT_WALLET_RUNBOOK.md). Use that file during class. This file explains the repo policy and the integration boundary.
+
 Why:
 
 - students should clone only the platform they need
@@ -63,6 +65,8 @@ Students should:
 ## Student baseline
 
 Students should receive a wallet fork where the iProov plumbing already exists.
+
+The classroom expectation is not "students build iProov from scratch". The classroom expectation is "students can run the wallet, point it at the local issuer, and understand where the gate sits in the presentation flow."
 
 - iOS:
   - real iProov credentials + physical iPhone: use the official native iProov iOS SDK

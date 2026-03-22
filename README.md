@@ -12,6 +12,12 @@ Monorepo implementing the architecture described in `DEMO.md`:
 - wallet-ios/ — Notes on integrating iProov & toggles in EUDI iOS wallet
 - wallet-android/ — Notes on integrating iProov & toggles in EUDI Android wallet
 
+## Start Here
+
+- Detailed lesson guide for students and instructors: [LESSON_RUNBOOK.md](/Users/johansellstrom/dev/iproov/RSA/LearningLab/LESSON_RUNBOOK.md)
+- Detailed mobile setup and testing guide: [STUDENT_WALLET_RUNBOOK.md](/Users/johansellstrom/dev/iproov/RSA/LearningLab/STUDENT_WALLET_RUNBOOK.md)
+- Mobile repo layout and fork policy: [WALLET_FORKS.md](/Users/johansellstrom/dev/iproov/RSA/LearningLab/WALLET_FORKS.md)
+
 ## Quickstart
 
 1) Bootstrap prerequisites + install dependencies
@@ -129,10 +135,12 @@ The mobile wallet source stays in separate iOS and Android forks beside `Learnin
 
 - Setup helper: `node scripts/setup-wallet-forks.js`
 - Student/instructor workflow: [WALLET_FORKS.md](/Users/johansellstrom/dev/iproov/RSA/LearningLab/WALLET_FORKS.md)
+- Student mobile runbook: [STUDENT_WALLET_RUNBOOK.md](/Users/johansellstrom/dev/iproov/RSA/LearningLab/STUDENT_WALLET_RUNBOOK.md)
 - Demo-flow guardrail: the browser-based `demo-conductor` path remains the existing demo path and must keep working even while wallet integrations evolve
 - iOS native path: use the official iProov iOS SDK on a physical iPhone when real iProov credentials are configured; keep the demo-mode callback fallback for simulator/lab work
 
 ## Lab tracks (step-by-step)
+- Zero-surprises classroom guide: [LESSON_RUNBOOK.md](/Users/johansellstrom/dev/iproov/RSA/LearningLab/LESSON_RUNBOOK.md)
 - Lab 00: labs/README-lab-00-start.md
 - Lab 01: labs/README-lab-01-issuance.md
 - Lab 02: labs/README-lab-02-bbs.md

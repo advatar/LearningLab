@@ -488,7 +488,10 @@ async function startServices() {
   const env = { ...process.env }
   env.ISSUER_BASE_URL = DEFAULT_ISSUER
   env.VERIFIER_BASE_URL = DEFAULT_VERIFIER
+  // LAB_ID activates the lesson-specific compatibility shims on `main`.
   env.LAB_ID = labId
+  // Pass explicit issuer URLs into the verifier so isolated port runs do not
+  // accidentally fall back to stale `.env` defaults from another lab session.
   env.ISSUER_JWKS_URL = `${DEFAULT_ISSUER}/.well-known/jwks.json`
   env.BBS_KEY_URL = `${DEFAULT_ISSUER}/.well-known/bbs-public-key`
   env.STATUS_LIST_URL = `${DEFAULT_ISSUER}/statuslist/${env.STATUS_LIST_ID || '1'}.json`

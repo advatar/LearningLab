@@ -130,3 +130,8 @@ Lesson sweep results
 - [x] Add LAB_ID compatibility handling so Labs 02 and 04 still pass on the integrated branch
 - [x] Verify the lesson sweep after the compatibility fix
 - [x] Commit the lesson compatibility fix
+- [x] Add a detailed integrated-repo teaching guide that explains LAB_ID, lesson expectations, and demo-vs-wallet behavior
+- [x] Add a detailed student wallet runbook for iOS and Android setup and testing
+- [x] Add source annotations around LAB_ID compatibility and iProov enforcement in issuer and verifier
+- [x] Verify builds locally after the documentation and annotation updates
+- [x] Commit the teaching documentation updates

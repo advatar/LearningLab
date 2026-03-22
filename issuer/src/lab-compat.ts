@@ -1,3 +1,7 @@
+// The integrated `main` branch keeps the final runtime behavior, but the
+// classroom checker still needs Lab 04 to isolate issuance-time liveness.
+// These helpers let `/credential` temporarily restore that lesson behavior
+// only when LAB_ID=04.
 export type CredentialIssuanceIProovDecision =
   | { allowed: true }
   | { allowed: false; reason: 'requires_liveness' }
