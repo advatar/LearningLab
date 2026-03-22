@@ -84,8 +84,13 @@ See `DEMO.md` for architecture and `LEARNING_LAB.md` for the 2-hour lab.
   - one student repo for the whole course
   - `LAB_ID` selects the active lab in GitHub Actions
   - branch-based lab detection is kept as a local/dev fallback
+- Important progression policy:
+  - the autograder checks only the currently active `LAB_ID`
+  - students do not need to pass one lab before you move them to the next
+  - instructors can move any repo forward at any time by updating `LAB_ID`
 - Run a local check (auto-starts services if needed):
   - `pnpm lab:check -- --lab 01`
+  - if `3001`/`3002` are already in use locally, isolate the run with `ISSUER_BASE_URL=http://127.0.0.1:3101 VERIFIER_BASE_URL=http://127.0.0.1:3102 pnpm lab:check -- --lab 01 --start`
 - Run the same command GitHub Actions uses:
   - `pnpm classroom:check`
   - On `main`, this defaults to Lab 05

@@ -146,3 +146,8 @@ Wallet verification notes
 - [x] Add concept-first explanations to each lesson README
 - [x] Add Mermaid diagrams to each lesson README to show the flow being built
 - [x] Verify the repo builds cleanly after the lesson README updates
+- [x] Make Classroom advancement default to instructor-controlled skipping, not ready-only gating
+- [x] Update classroom docs to explain that autograding is per-active-lab and progression can skip ahead
+- [x] Harden `scripts/lab-check.js` so `--start` honors custom base URLs and does not silently grade against stale local services
+- [x] Add unit tests for the `lab-check` start-target helpers
+- [x] Verify the updated advancement tooling and tests locally

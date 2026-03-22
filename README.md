@@ -154,8 +154,13 @@ The mobile wallet source stays in separate iOS and Android forks beside `Learnin
   - one student repo for the whole course
   - `LAB_ID` selects the active lab in GitHub Actions
   - branch-based lab detection is kept as a local/dev fallback
+- Important progression policy:
+  - the autograder checks only the currently active `LAB_ID`
+  - students do not need to pass Lab 01 before you move them to Lab 02
+  - you can move any repo forward at any time by setting `LAB_ID`
 - Run a local check (auto-starts services if needed):
   - `pnpm lab:check -- --lab 01`
+  - if you already have services on `3001`/`3002`, isolate the run with `ISSUER_BASE_URL=http://127.0.0.1:3101 VERIFIER_BASE_URL=http://127.0.0.1:3102 pnpm lab:check -- --lab 01 --start`
 - Run the same command GitHub Actions uses:
   - `pnpm classroom:check`
   - On `main`, this defaults to Lab 05
@@ -169,9 +174,11 @@ The mobile wallet source stays in separate iOS and Android forks beside `Learnin
 - Audit which repos are ready to advance:
   - `pnpm classroom:progress --classroom-csv accepted_assignments.csv`
   - `pnpm classroom:progress --classroom-csv accepted_assignments.csv --only-ready --json`
-- Advance only the repos that are ready for a specific current lab:
+- Advance every repo currently on a specific lab, regardless of pass/fail:
   - `pnpm classroom:advance --classroom-csv accepted_assignments.csv --from 01`
   - `pnpm classroom:advance --classroom-csv accepted_assignments.csv --from 01 --apply`
+- If you want pass-first advancement, opt into it explicitly:
+  - `pnpm classroom:advance --classroom-csv accepted_assignments.csv --from 01 --only-ready`
 - Use GitHub Classroom + Actions:
   - Workflow: `.github/workflows/classroom.yml`
   - Docs: `COURSE_CLASSROOM.md`

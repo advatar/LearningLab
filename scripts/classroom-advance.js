@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 /*
- * Instructor helper that advances only repos that are ready based on the
- * latest classroom.yml run on main.
+ * Instructor helper that advances repos by LAB_ID.
+ *
+ * Default behavior is instructor-controlled progression: if a repo is on the
+ * requested --from lab, it can be advanced whether or not the latest run
+ * passed. Use --only-ready to restore pass-first advancement.
  *
  * Default mode is dry-run. Use --apply to actually change LAB_ID values.
  */
@@ -12,6 +15,7 @@ const { collectProgress } = require('./classroom-progress.js')
 function printUsage() {
   console.log(`Usage:
   node scripts/classroom-advance.js --classroom-csv accepted_assignments.csv --from 01
+  node scripts/classroom-advance.js --classroom-csv accepted_assignments.csv --from 01 --only-ready
   node scripts/classroom-advance.js --repo owner/name --from 02 --apply
 
 Options:
@@ -20,6 +24,7 @@ Options:
   --classroom-csv <path>     CSV export containing repo URLs or owner/name slugs
   --from <00-05>             Only advance repos currently on this LAB_ID
   --workflow <file>          Workflow file to inspect (default: classroom.yml)
+  --only-ready               Advance only repos whose latest run passed
   --apply                    Perform the LAB_ID updates (default is dry-run)
   --json                     Emit JSON instead of tab-separated text
   --help                     Show this message
@@ -33,6 +38,7 @@ function parseArgs(argv) {
     classroomCsv: null,
     from: null,
     workflow: 'classroom.yml',
+    onlyReady: false,
     apply: false,
     json: false,
     help: false
@@ -53,16 +59,19 @@ function parseArgs(argv) {
     else if (arg.startsWith('--from=')) out.from = arg.split('=')[1]
     else if (arg === '--workflow') out.workflow = argv[++i]
     else if (arg.startsWith('--workflow=')) out.workflow = arg.split('=')[1]
+    else if (arg === '--only-ready') out.onlyReady = true
     else throw new Error(`Unknown argument: ${arg}`)
   }
 
   return out
 }
 
-function buildAdvancePlan(progress, fromLabId) {
+function buildAdvancePlan(progress, fromLabId, options = {}) {
+  const onlyReady = Boolean(options.onlyReady)
   return progress
-    .filter((item) => item.readyToAdvance)
     .filter((item) => !fromLabId || item.currentLabId === fromLabId)
+    .filter((item) => item.nextLabId)
+    .filter((item) => !onlyReady || item.readyToAdvance)
     .map((item) => ({
       repo: item.repo,
       fromLabId: item.currentLabId,
@@ -109,7 +118,7 @@ function main() {
   ensureGhAvailable()
 
   const progress = collectProgress(repos, args.workflow)
-  const plan = buildAdvancePlan(progress, fromLabId)
+  const plan = buildAdvancePlan(progress, fromLabId, { onlyReady: args.onlyReady })
 
   if (args.apply && !fromLabId && plan.length > 1) {
     throw new Error('Refusing to advance multiple repos without --from; scope the cohort explicitly')

@@ -8,12 +8,13 @@ const scriptUrl = pathToFileURL(path.join(__dirname, '..', 'scripts', 'classroom
 const mod = await import(scriptUrl)
 const api = mod.default ?? mod
 
-test('parseArgs supports csv, from-lab filtering, apply, and json', () => {
+test('parseArgs supports csv, from-lab filtering, readiness gating, apply, and json', () => {
   const args = api.parseArgs([
     '--classroom-csv',
     'accepted_assignments.csv',
     '--from',
     '02',
+    '--only-ready',
     '--apply',
     '--json'
   ])
@@ -24,13 +25,14 @@ test('parseArgs supports csv, from-lab filtering, apply, and json', () => {
     classroomCsv: 'accepted_assignments.csv',
     from: '02',
     workflow: 'classroom.yml',
+    onlyReady: true,
     apply: true,
     json: true,
     help: false
   })
 })
 
-test('buildAdvancePlan keeps only ready repos and respects --from', () => {
+test('buildAdvancePlan advances all repos on the current lab by default', () => {
   const progress = [
     {
       repo: 'advatar/student-one',
@@ -64,6 +66,52 @@ test('buildAdvancePlan keeps only ready repos and respects --from', () => {
       fromLabId: '02',
       toLabId: '03',
       runUrl: 'https://example.test/2',
+      reason: 'Latest run passed on main'
+    },
+    {
+      repo: 'advatar/student-three',
+      fromLabId: '02',
+      toLabId: '03',
+      runUrl: 'https://example.test/3',
+      reason: 'Latest run concluded failure'
+    }
+  ])
+})
+
+test('buildAdvancePlan supports opt-in ready-only filtering', () => {
+  const progress = [
+    {
+      repo: 'advatar/student-one',
+      currentLabId: '02',
+      nextLabId: '03',
+      readyToAdvance: true,
+      reason: 'Latest run passed on main',
+      runUrl: 'https://example.test/1'
+    },
+    {
+      repo: 'advatar/student-two',
+      currentLabId: '02',
+      nextLabId: '03',
+      readyToAdvance: false,
+      reason: 'Latest run concluded failure',
+      runUrl: 'https://example.test/2'
+    },
+    {
+      repo: 'advatar/student-three',
+      currentLabId: '05',
+      nextLabId: '',
+      readyToAdvance: false,
+      reason: 'Final lab already reached',
+      runUrl: 'https://example.test/3'
+    }
+  ]
+
+  assert.deepEqual(api.buildAdvancePlan(progress, '02', { onlyReady: true }), [
+    {
+      repo: 'advatar/student-one',
+      fromLabId: '02',
+      toLabId: '03',
+      runUrl: 'https://example.test/1',
       reason: 'Latest run passed on main'
     }
   ])

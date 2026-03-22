@@ -40,21 +40,15 @@ let relayHits = []
 // lab checks (e.g., OHTTP env validation vs. live relay probing).
 let startedServices = false
 
-main()
-  .catch((err) => {
-    console.error('[lab-check] FAILED:', err?.message || err)
-    process.exitCode = 1
-  })
-  .finally(async () => {
-    await cleanup()
-  })
-
 async function main() {
   // Decide whether to start issuer/verifier locally. In CI, they are not
   // running yet, so we usually start them. If they are already up, we avoid
   // spawning duplicates and instead reuse the running services.
   const shouldStart = await decideStart()
   if (shouldStart) {
+    if (args.start === true) {
+      await assertStartTargetsAvailable()
+    }
     startedServices = true
     await startServices()
   }
@@ -485,9 +479,7 @@ async function isUp(url) {
 async function startServices() {
   // Clone process.env so we can override defaults for the child processes
   // without mutating the current process environment.
-  const env = { ...process.env }
-  env.ISSUER_BASE_URL = DEFAULT_ISSUER
-  env.VERIFIER_BASE_URL = DEFAULT_VERIFIER
+  const env = buildServiceEnv(DEFAULT_ISSUER, DEFAULT_VERIFIER, process.env)
   // LAB_ID activates the lesson-specific compatibility shims on `main`.
   env.LAB_ID = labId
   // Pass explicit issuer URLs into the verifier so isolated port runs do not
@@ -526,6 +518,43 @@ async function startServices() {
   verifierProc.on('exit', (code) => {
     if (code && code !== 0) console.error(`[lab-check] verifier exited with ${code}`)
   })
+}
+
+function buildServiceEnv(issuerBaseUrl, verifierBaseUrl, baseEnv = process.env) {
+  const env = { ...baseEnv }
+  env.ISSUER_BASE_URL = issuerBaseUrl
+  env.VERIFIER_BASE_URL = verifierBaseUrl
+  env.ISSUER_PORT = String(env.ISSUER_PORT || resolvePortFromUrl(issuerBaseUrl, 3001))
+  env.VERIFIER_PORT = String(env.VERIFIER_PORT || resolvePortFromUrl(verifierBaseUrl, 3002))
+  return env
+}
+
+function resolvePortFromUrl(rawUrl, fallback) {
+  try {
+    const parsed = new URL(rawUrl)
+    if (parsed.port) return Number(parsed.port)
+    if (parsed.protocol === 'https:') return 443
+    if (parsed.protocol === 'http:') return 80
+  } catch (_) {
+    // fall through to the caller-provided fallback
+  }
+  return fallback
+}
+
+async function findRunningTargets(issuerBaseUrl = DEFAULT_ISSUER, verifierBaseUrl = DEFAULT_VERIFIER, probe = isUp) {
+  const targets = []
+  if (await probe(`${issuerBaseUrl}/.well-known/openid-credential-issuer`)) targets.push(issuerBaseUrl)
+  if (await probe(`${verifierBaseUrl}/`)) targets.push(verifierBaseUrl)
+  return targets
+}
+
+async function assertStartTargetsAvailable(issuerBaseUrl = DEFAULT_ISSUER, verifierBaseUrl = DEFAULT_VERIFIER, probe = isUp) {
+  const running = await findRunningTargets(issuerBaseUrl, verifierBaseUrl, probe)
+  if (running.length > 0) {
+    throw new Error(
+      `--start requested but services are already running at ${running.join(', ')}; stop them, use --no-start, or set ISSUER_BASE_URL/VERIFIER_BASE_URL to isolated ports`
+    )
+  }
 }
 
 async function startRelayServer() {
@@ -631,4 +660,25 @@ async function terminateProcess(proc) {
   if (result === 'timeout') {
     proc.kill('SIGKILL')
   }
+}
+
+if (require.main === module) {
+  main()
+    .catch((err) => {
+      console.error('[lab-check] FAILED:', err?.message || err)
+      process.exitCode = 1
+    })
+    .finally(async () => {
+      await cleanup()
+    })
+}
+
+module.exports = {
+  assertStartTargetsAvailable,
+  buildServiceEnv,
+  findRunningTargets,
+  inferLabId,
+  normalizeLabId,
+  parseArgs,
+  resolvePortFromUrl
 }

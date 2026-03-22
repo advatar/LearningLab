@@ -50,7 +50,8 @@ What still requires GitHub:
 How `LAB_ID` fits the hosted course:
 - Store `LAB_ID` as an Actions variable on the student repo
 - Start learners on `LAB_ID=00` or `LAB_ID=01`
-- When the learner completes a lab, update `LAB_ID` on that repo to unlock the next check
+- Update `LAB_ID` on that repo whenever you want to move the learner forward
+- The autograder does not enforce previous-lab correctness before you do this
 - Keep the repo on `main`; do not require students to switch grading branches
 
 ## 1) Create a student template repo (sanitized)
@@ -90,6 +91,7 @@ The script will infer the lab ID from branch name (e.g., `lab-01-issuance` → `
 - Autograding:
   - Select **Custom YAML** and use the existing `classroom.yml`, or
   - Select **Run command** and use `LAB_ID=01 pnpm -C LearningLab lab:check -- --start --verbose`.
+  - For local rehearsals on a machine that already has issuer/verifier processes on `3001`/`3002`, set `ISSUER_BASE_URL` and `VERIFIER_BASE_URL` to isolated ports before running `lab:check --start`.
 
 Branch-based detection is still supported, but `LAB_ID` should be the primary control plane.
 
@@ -98,6 +100,11 @@ Branch-based detection is still supported, but `LAB_ID` should be the primary co
 - Recommended:
   - Set `LAB_ID=01` (or `02`, etc.) in **Settings → Secrets and variables → Actions → Variables**
   - Advance the learner by updating that value on the repo
+- If you want learners to skip ahead:
+  - set `LAB_ID` directly to the target lesson
+  - or use `pnpm classroom:advance --from 01 --apply` to move everyone currently on Lab 01 forward, regardless of pass/fail
+- If you want pass-first advancement:
+  - use `pnpm classroom:advance --from 01 --only-ready --apply`
 - Fallback:
   - branch naming like `lab-01-issuance` remains supported for local/dev use
 
