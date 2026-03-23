@@ -197,7 +197,7 @@ Wallet verification notes
 - [x] Move terminal demo and technical reference material into a separate reference doc
 - [x] Verify the cleaned Quickstart paths against the current repo
 - [x] Commit the student-facing README cleanup
-- [ ] Add Codespaces UI guidance to the attendee docs
-- [ ] Include the provided Codespaces screenshot in both source and template docs
-- [ ] Verify the updated student docs locally
-- [ ] Commit the Codespaces screenshot documentation update
+- [x] Add Codespaces UI guidance to the attendee docs
+- [x] Include the provided Codespaces screenshot in both source and template docs
+- [x] Verify the updated student docs locally
+- [x] Commit the Codespaces screenshot documentation update
