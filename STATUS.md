@@ -151,3 +151,6 @@ Wallet verification notes
 - [x] Harden `scripts/lab-check.js` so `--start` honors custom base URLs and does not silently grade against stale local services
 - [x] Add unit tests for the `lab-check` start-target helpers
 - [x] Verify the updated advancement tooling and tests locally
+- [x] Add public reference links and summaries for the RSAC/session and Show & Tell sites to the root README
+- [x] Verify the repo build after the README reference update
+- [x] Commit the README reference update

@@ -18,6 +18,15 @@ Monorepo implementing the architecture described in `DEMO.md`:
 - Detailed mobile setup and testing guide: [STUDENT_WALLET_RUNBOOK.md](/Users/johansellstrom/dev/iproov/RSA/LearningLab/STUDENT_WALLET_RUNBOOK.md)
 - Mobile repo layout and fork policy: [WALLET_FORKS.md](/Users/johansellstrom/dev/iproov/RSA/LearningLab/WALLET_FORKS.md)
 
+## Public references
+
+- RSAC Conference session catalog: https://path.rsaconference.com/flow/rsac/us26/FullAgenda/page/catalog/session/1755524542872001ceX6
+  - Public agenda entry for the conference session tied to this learning-lab work and live demo.
+- Beyond Compliance course site: https://beyondcompliance.showntell.dev
+  - Public landing page for the lab, framing the repo as a hands-on course for building a privacy-first identity wallet with SD-JWT, BBS+, OHTTP, iProov, and privacy-preserving revocation.
+- Beyond Compliance demo site: https://beyondcompliance-demo.showntell.dev
+  - Google sign-in entrypoint for the live demo flow, where each attendee gets an isolated session to walk through credential issuance, iProov liveness, and selective disclosure.
+
 ## Quickstart
 
 1) Bootstrap prerequisites + install dependencies
