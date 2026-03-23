@@ -21,8 +21,6 @@ If you are joining the in-person lab, do not start with a local install.
 3. Follow [ATTENDEE_QUICKSTART.md](ATTENDEE_QUICKSTART.md).
 4. Start Lab 00 from [labs/README-lab-00-start.md](labs/README-lab-00-start.md).
 
-Google Classroom is optional for this repo. GitHub Classroom + Codespaces is the primary student path.
-
 ## Other docs
 
 - Detailed lesson guide for students and instructors: [LESSON_RUNBOOK.md](LESSON_RUNBOOK.md)

@@ -8,7 +8,7 @@ Use GitHub Codespaces. Do not spend the first 10 minutes on local setup.
 - The GitHub Classroom invite link shared by the instructors
 - A modern browser
 
-Google Classroom is optional for this lab. Your repo and coding environment come from GitHub Classroom and GitHub Codespaces.
+Your repo and coding environment come from GitHub Classroom and GitHub Codespaces.
 
 ## Recommended path: GitHub Codespaces
 
