@@ -173,3 +173,4 @@ Wallet verification notes
 - [x] Document the Wednesday in-person no-email GitHub Classroom flow
 - [x] Verify the updated `course-ops` tests and CLI flow locally
 - [x] Publish the Lab 00 Google Classroom coursework connected to the live GitHub Classroom assignment
+- [x] Fix the `course-ops` Google coursework patch mask so published-state updates work

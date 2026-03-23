@@ -100,7 +100,6 @@ export function buildCourseWorkPatch(courseWork) {
     'dueTime',
     'scheduledTime',
     'maxPoints',
-    'workType',
     'submissionModificationMode',
     'topicId',
     'gradingPeriodId'

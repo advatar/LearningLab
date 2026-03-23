@@ -31,6 +31,18 @@ test('buildCourseWorkPatch rejects empty payloads', () => {
   assert.throws(() => buildCourseWorkPatch({ materials: [] }), /No coursework fields provided/)
 })
 
+test('buildCourseWorkPatch excludes non-patchable workType changes', () => {
+  const patch = buildCourseWorkPatch({
+    workType: 'ASSIGNMENT',
+    state: 'PUBLISHED'
+  })
+
+  assert.equal(patch.updateMask, 'state')
+  assert.deepEqual(patch.body, {
+    state: 'PUBLISHED'
+  })
+})
+
 test('buildStudentSubmissionGradePatch skips unchanged grades', () => {
   const patch = buildStudentSubmissionGradePatch({
     submission: {
