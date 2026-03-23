@@ -185,3 +185,6 @@ Wallet verification notes
 - [x] Remove Google Classroom mentions from the student-facing onboarding docs
 - [x] Verify the GitHub-only onboarding copy stays aligned across source and template docs
 - [x] Commit the student-facing onboarding cleanup
+- [ ] Rename the local git remotes so the active development remote becomes `origin`
+- [ ] Verify the renamed remotes and branch tracking configuration locally
+- [ ] Commit the remote-rename task tracking update
