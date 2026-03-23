@@ -1,13 +1,16 @@
 # Lab 01 — SD-JWT Issuance (OIDC4VCI)
 
-Branch: `lab-01-issuance` · Timebox: 20 minutes
+Lab ID: `01` · Timebox: 20 minutes
 
 Goal: implement offer → token → credential for SD-JWT VCs so the verifier can see issued claims.
 
-Prereqs
-- Checkout branch: `git checkout lab-01-issuance`.
-- Env ready: `pnpm env:setup` (leave defaults).
-- Install deps if not already: `pnpm install -r`.
+Environment tracks
+- Codespaces
+  - Stay on `main` in your Codespace.
+  - Your `.env` files and dependencies should already be ready from setup.
+- Local terminal
+  - Stay on `main` in your local clone.
+  - If you are starting fresh, run `pnpm env:setup` and `pnpm install -r --frozen-lockfile`.
 
 Steps (edit + test)
 1) Implement issuer offer and token

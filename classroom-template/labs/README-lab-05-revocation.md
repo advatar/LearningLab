@@ -1,6 +1,6 @@
 # Lab 05 — Privacy-Preserving Revocation (Bitstring Status List)
 
-Branch: `lab-05-revocation` · Timebox: 20 minutes
+Lab ID: `05` · Timebox: 20 minutes
 
 Goal: embed credential status in issued VCs and have the verifier check a Bitstring Status List (via OHTTP if enabled).
 
@@ -44,10 +44,16 @@ sequenceDiagram
 - a bitstring status list is more privacy-preserving than a direct “is credential X revoked?” lookup
 - this lab builds on the issuance work from Labs 01 and 02 rather than replacing it
 
-Prereqs
-- Checkout branch: `git checkout lab-05-revocation`.
-- Env ready: `pnpm env:setup`; set `STATUS_LIST_ID` as needed.
-- Services running: `pnpm dev`.
+Environment tracks
+- Codespaces
+  - Stay on `main` in your Codespace.
+  - Your `.env` files and dependencies should already be ready from setup.
+- Local terminal
+  - Stay on `main` in your local clone.
+  - If you are starting fresh, run `pnpm env:setup` and `pnpm install -r --frozen-lockfile`.
+
+Additional setup
+- Set `STATUS_LIST_ID` in your local `.env` files as needed.
 
 Steps (edit + test)
 1) Generate status list

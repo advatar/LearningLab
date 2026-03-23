@@ -1,13 +1,19 @@
 # Lab 03 — OHTTP Relay
 
-Branch: `lab-03-ohttp` · Timebox: 20 minutes
+Lab ID: `03` · Timebox: 20 minutes
 
 Goal: route issuer and verifier calls through an OHTTP relay so servers never see client IPs.
 
-Prereqs
-- Checkout branch: `git checkout lab-03-ohttp`.
-- Env ready with relay URL placeholders: `pnpm env:setup`.
-- Cloudflare account (recommended) or use the local worker stub in `ohttp/`.
+Environment tracks
+- Codespaces
+  - Stay on `main` in your Codespace.
+  - Your `.env` files and dependencies should already be ready from setup.
+- Local terminal
+  - Stay on `main` in your local clone.
+  - If you are starting fresh, run `pnpm env:setup` and `pnpm install -r --frozen-lockfile`.
+
+Additional setup
+- Cloudflare account (recommended), or use the local worker stub in `ohttp/`.
 
 Steps (edit + test)
 1) Configure the relay

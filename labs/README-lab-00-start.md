@@ -1,13 +1,18 @@
 # Lab 00 — Start (Scaffolding + Health Checks)
 
-Branch: `lab-00-start` · Timebox: 10 minutes
+Lab ID: `00` · Timebox: 10 minutes
 
 Goal: get the scaffold running, env files in place, and verify the expected 501 stubs before coding.
 
-Prereqs
-- Node.js 20.x, pnpm installed.
-- This branch checked out (`git checkout lab-00-start`).
-- Create local env files (cross-platform): `pnpm env:setup`.
+Environment tracks
+- Codespaces
+  - Stay on `main` in your Codespace.
+  - The dev container usually already ran `pnpm env:setup` and `pnpm install -r --frozen-lockfile` for you.
+- Local terminal
+  - Stay on `main` in your local clone.
+  - Install prerequisites with the root `README.md` bootstrap steps.
+  - Run `pnpm env:setup`.
+  - Run `pnpm install -r --frozen-lockfile`.
 
 Steps
 1) Install deps: `pnpm install -r`.
@@ -27,4 +32,4 @@ Pass criteria
 Troubleshooting
 - Port in use: edit `ISSUER_PORT` / `VERIFIER_PORT` in `.env` files to avoid conflicts.
 - Node/pnpm missing: see repo `README.md` for bootstrap scripts (macOS + Windows + Codespaces).
-- If metadata endpoint 404s, ensure you are on the correct branch and the dev servers are running. 
+- If the metadata endpoint 404s, ensure the dev servers are running on `main`.

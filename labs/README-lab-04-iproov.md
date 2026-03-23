@@ -1,14 +1,20 @@
 # Lab 04 — iProov Liveness Gate
 
-Branch: `lab-04-iproov` · Timebox: 20 minutes
+Lab ID: `04` · Timebox: 20 minutes
 
 Goal: require a successful iProov verification before releasing/presenting credentials.
 
-Prereqs
-- Checkout branch: `git checkout lab-04-iproov`.
+Environment tracks
+- Codespaces
+  - Stay on `main` in your Codespace.
+  - Your `.env` files and dependencies should already be ready from setup.
+- Local terminal
+  - Stay on `main` in your local clone.
+  - If you are starting fresh, run `pnpm env:setup` and `pnpm install -r --frozen-lockfile`.
+
+Additional setup
 - iProov sandbox credentials available (use placeholders if demoing).
-- Env ready: `pnpm env:setup`; set `IPROOV_BASE_URL`, `IPROOV_API_KEY`, `IPROOV_MANAGEMENT_KEY`, `IPROOV_PASS_TOKEN` (for local demo).
-- Services running: `pnpm dev`.
+- Set `IPROOV_BASE_URL`, `IPROOV_API_KEY`, `IPROOV_MANAGEMENT_KEY`, and `IPROOV_PASS_TOKEN` in `issuer/.env` for local demo work.
 
 Steps (edit + test)
 1) Add claim + webhook endpoints

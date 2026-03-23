@@ -1,13 +1,16 @@
 # Lab 02 — BBS+ Selective Disclosure
 
-Branch: `lab-02-bbs` · Timebox: 25 minutes
+Lab ID: `02` · Timebox: 25 minutes
 
 Goal: issue DI+BBS credentials and verify unlinkable proofs revealing only selected claims.
 
-Prereqs
-- Checkout branch: `git checkout lab-02-bbs`.
-- Env ready: `pnpm env:setup`.
-- Services running: `pnpm dev`.
+Environment tracks
+- Codespaces
+  - Stay on `main` in your Codespace.
+  - Your `.env` files and dependencies should already be ready from setup.
+- Local terminal
+  - Stay on `main` in your local clone.
+  - If you are starting fresh, run `pnpm env:setup` and `pnpm install -r --frozen-lockfile`.
 
 Steps (edit + test)
 1) Add BBS credential config
