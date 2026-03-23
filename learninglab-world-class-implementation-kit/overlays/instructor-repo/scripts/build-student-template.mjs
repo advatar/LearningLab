@@ -31,6 +31,10 @@ const EXCLUDE_FILES = new Set([
   '.DS_Store'
 ])
 
+const SENSITIVE_FILE_PREFIXES = [
+  'client_secret_'
+]
+
 const STRIP_AFTER_COPY = [
   path.join('scripts', 'classroom-advance.js'),
   path.join('scripts', 'classroom-progress.js'),
@@ -90,6 +94,7 @@ function shouldSkip(relPath, entry) {
   if (EXCLUDE_ROOT_ITEMS.has(normalized)) return true
   if (EXCLUDE_DIRS.has(base)) return true
   if (EXCLUDE_FILES.has(base)) return true
+  if (SENSITIVE_FILE_PREFIXES.some((prefix) => base.startsWith(prefix))) return true
   if (base === '.env' || base.startsWith('.env.')) return true
   if (base.endsWith('.log')) return true
   if (entry.isSymbolicLink?.()) return true

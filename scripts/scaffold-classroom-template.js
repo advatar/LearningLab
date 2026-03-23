@@ -53,6 +53,10 @@ const EXCLUDE_FILES = new Set([
   '.DS_Store'
 ])
 
+const SENSITIVE_FILE_PREFIXES = [
+  'client_secret_'
+]
+
 function toPosix(p) {
   return p.split(path.sep).join('/')
 }
@@ -68,6 +72,7 @@ function shouldExclude(relPath, entry) {
 
   if (EXCLUDE_DIRS.has(base)) return true
   if (EXCLUDE_FILES.has(base)) return true
+  if (SENSITIVE_FILE_PREFIXES.some((prefix) => base.startsWith(prefix))) return true
 
   // .env files may contain secrets or environment-specific tokens.
   // We exclude them to avoid credential leakage in the public template.

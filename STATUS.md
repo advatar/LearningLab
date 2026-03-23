@@ -210,3 +210,8 @@ Wallet verification notes
 - [x] Keep one shared student lab flow while clarifying the two environment tracks
 - [x] Verify the lesson-doc updates locally
 - [x] Commit and push the dual-track lesson updates
+- [ ] Add an `iProov-Education` GitHub migration config and org-backed URLs
+- [ ] Prevent OAuth client secrets from leaking into generated student templates
+- [ ] Verify the migrated template generation and course-ops config locally
+- [ ] Publish the instructor and starter repos to `iProov-Education`
+- [ ] Commit and push the `iProov-Education` migration updates
