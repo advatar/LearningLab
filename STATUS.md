@@ -166,5 +166,5 @@ Wallet verification notes
 - [x] Add a local-only Classroom course ID override for `course-ops`
 - [x] Document the local-only Classroom course ID override
 - [x] Verify `course-ops` after the Classroom course ID override
-- [ ] Supply the real Google Classroom course ID in the instructor-only local env
-- [ ] Verify Google roster import against the instructor course config once the real course ID is available
+- [x] Supply the real Google Classroom course ID in the instructor-only local env
+- [x] Verify Google roster import against the instructor course config once the real course ID is available
