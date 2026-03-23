@@ -205,3 +205,8 @@ Wallet verification notes
 - [x] Remove template-repo caveats from the attendee docs
 - [x] Verify the updated screenshot references locally
 - [x] Commit the attendee Codespaces screenshot swap
+- [ ] Update all lesson docs to support both Codespaces and local terminal users
+- [ ] Remove outdated branch-checkout assumptions from the lesson docs
+- [ ] Keep one shared student lab flow while clarifying the two environment tracks
+- [ ] Verify the lesson-doc updates locally
+- [ ] Commit and push the dual-track lesson updates
