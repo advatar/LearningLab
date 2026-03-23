@@ -192,3 +192,8 @@ Wallet verification notes
 - [x] Add a dedicated Village demo conductor runbook
 - [x] Verify the repo locally after the README/doc split
 - [x] Commit the Village demo conductor doc split
+- [ ] Remove instructor-only and technical reference sections from the student-facing READMEs
+- [ ] Move GitHub Classroom/autograding guidance into a dedicated instructor doc
+- [ ] Move terminal demo and technical reference material into a separate reference doc
+- [ ] Verify the cleaned Quickstart paths against the current repo
+- [ ] Commit the student-facing README cleanup
