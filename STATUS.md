@@ -182,3 +182,6 @@ Wallet verification notes
 - [x] Keep the source and student-template quick-start docs aligned
 - [x] Verify the updated attendee docs locally
 - [x] Commit the attendee quick-start terminal fallback
+- [ ] Remove Google Classroom mentions from the student-facing onboarding docs
+- [ ] Verify the GitHub-only onboarding copy stays aligned across source and template docs
+- [ ] Commit the student-facing onboarding cleanup
