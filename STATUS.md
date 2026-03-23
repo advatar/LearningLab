@@ -201,3 +201,7 @@ Wallet verification notes
 - [x] Include the provided Codespaces screenshot in both source and template docs
 - [x] Verify the updated student docs locally
 - [x] Commit the Codespaces screenshot documentation update
+- [ ] Replace the attendee Codespaces screenshot with the student-repo view
+- [ ] Remove template-repo caveats from the attendee docs
+- [ ] Verify the updated screenshot references locally
+- [ ] Commit the attendee Codespaces screenshot swap
