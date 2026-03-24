@@ -52,9 +52,10 @@ Environment tracks
 
 Additional setup
 - iProov sandbox credentials available (use placeholders if demoing).
-- For real sandbox use, set `IPROOV_BASE_URL`, `IPROOV_API_KEY`, and `IPROOV_SECRET` in `issuer/.env`.
-- `IPROOV_MANAGEMENT_KEY` is only an alternate env name this repo also accepts.
-- `IPROOV_PASS_TOKEN` is demo-only and not needed for the real sandbox flow.
+- This workshop uses a Codespaces-only setup for the real iProov flow.
+- In Codespaces, the instructor has already provided the required iProov credentials.
+- Students should not edit `issuer/.env` or paste iProov secrets into the repo.
+- Outside Codespaces, use the demo webhook path unless the instructor has explicitly provided a separate local setup.
 
 Steps (edit + test)
 1) Add claim + webhook endpoints

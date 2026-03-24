@@ -20,23 +20,16 @@ You do not need a full production integration.
 
 - Finish Labs 01 and 02 first.
 - Keep `pnpm dev` running.
-- Demo mode is acceptable for this lab.
+- This workshop uses a Codespaces-only setup for Lab 04.
 
-If you have real sandbox credentials, set these in `issuer/.env`:
+For students in Codespaces:
 
-```dotenv
-IPROOV_BASE_URL=https://us.rp.secure.iproov.me
-IPROOV_API_KEY=<your api key>
-IPROOV_SECRET=<your api secret>
-```
+- the instructor has already provided the required iProov credentials
+- you do not need to edit `issuer/.env`
+- you do not need to paste any iProov secret into the repo
 
-Important:
-
-- `IPROOV_SECRET` is the normal real-credentials path
-- `IPROOV_MANAGEMENT_KEY` is only an alternate name this repo also accepts
-- `IPROOV_PASS_TOKEN` is demo-only and is not needed for the real sandbox flow
-
-If you do not have real sandbox credentials, leave the real-secret values unset and use the demo-mode path and webhook simulation below.
+For this workshop, treat the Codespace as the only supported path for the real iProov flow.
+If you are working outside Codespaces, use the demo-mode webhook path unless the instructor has explicitly given you a separate local setup.
 
 ## Files you will edit
 

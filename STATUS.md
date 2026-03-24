@@ -294,3 +294,8 @@ Wallet verification notes
 - [x] Rebuild the student template and verify the iProov env clarification is included
 - [x] Publish the iProov env clarification to the starter repos
 - [x] Commit and push the iProov env clarification update
+- [x] Update Lab 04 for the Codespaces-only iProov credential setup
+- [x] Update the template-facing Lab 04 copy to match the Codespaces-only setup
+- [x] Rebuild the student template and verify the Codespaces-only iProov wording is included
+- [x] Publish the Codespaces-only iProov wording to the starter repos
+- [ ] Commit and push the Codespaces-only iProov wording update
