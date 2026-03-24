@@ -238,4 +238,4 @@ Wallet verification notes
 - [x] Update attendee docs so port-opening expectations match the app routes
 - [x] Verify the issuer landing page and docs locally
 - [x] Publish the issuer landing-page update to the starter repos
-- [ ] Commit and push the issuer landing-page update
+- [x] Commit and push the issuer landing-page update
