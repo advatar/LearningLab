@@ -252,4 +252,4 @@ Wallet verification notes
 - [x] Add explicit per-stub pointers to the matching lab README in the student overrides
 - [x] Rebuild the student templates and verify the runbook is excluded
 - [x] Publish the runbook-exclusion update to the starter repos
-- [ ] Commit and push the runbook-exclusion update
+- [x] Commit and push the runbook-exclusion update
