@@ -224,6 +224,9 @@ Wallet verification notes
 - [x] Sync the wallet-doc clarification into the live per-assignment starter repo
 - [x] Verify the per-assignment starter repo builds after the wallet-doc sync
 - [x] Push the per-assignment starter repo update so Classroom sync can pick it up
+- [x] Add certificate-backed wallet request signing so the mobile wallets accept the verifier request object
+- [x] Add verifier tests for wallet request JWT headers
+- [x] Verify the verifier tests and full repo build after the wallet request signing fix
 - [x] Add speaker notes to the LAB2 RSAC deck that reflect the current integrated repo
 - [x] Call out repo/codebase differences versus the lesson flow, including components students do not modify in Labs 00-05
 - [x] Verify the deck notes were written successfully, then commit and push only the deck and status updates
@@ -332,4 +335,6 @@ Wallet verification notes
 - [x] Configure the RP request to ask for `age_over >= 21` and `nationality`
 - [x] Install TLS reverse proxying for the public issuer/verifier domains
 - [x] Smoke-test the public issuer and verifier endpoints
+- [ ] Redeploy the public verifier with certificate-backed wallet request signing
+- [ ] Verify the live wallet request JWT now includes an `x5c` header
 - [ ] Commit and push the VM deployment status update

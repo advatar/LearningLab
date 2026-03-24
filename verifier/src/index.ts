@@ -9,11 +9,12 @@ import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
 import { createHash, randomBytes } from 'node:crypto'
-import { SignJWT, decodeJwt, decodeProtectedHeader, exportJWK, generateKeyPair, importJWK, jwtVerify } from 'jose'
+import { decodeJwt, decodeProtectedHeader, importJWK, jwtVerify } from 'jose'
 import { base64ToBytes, verifyProof as verifyBbsProof } from 'bbs-lib'
 import { assertPassedIProovSession } from './iproov.js'
 import { shouldRequireIProovForBbsVerification } from './lab-compat.js'
 import { buildVpRequest } from './vp-request.js'
+import { createWalletRequestSigner, signWalletRequestObject } from './wallet-request-signing.js'
 import {
   buildWalletRequestObject,
   createWalletSession,
@@ -52,7 +53,7 @@ const cachedJwks = new Map<string, any>()
 let cachedBbsPublicKey: Uint8Array | null = null
 const vpNonces = new Map<string, number>()
 const walletSessions = new Map<string, WalletRpSession>()
-const walletRequestKeys = await createWalletRequestKeys()
+const walletRequestSigner = await createWalletRequestSigner(BASE_URL)
 
 app.get('/', (_req, res) => {
   res.setHeader('content-type', 'text/html').send(`<!doctype html>
@@ -93,7 +94,7 @@ app.get('/wallet/session/:id', async (req, res) => {
 app.get('/wallet/request.jwt/:id', async (req, res) => {
   const session = walletSessions.get(req.params.id)
   if (!session) return res.status(404).json({ ok: false, error: 'wallet_session_not_found' })
-  const jwt = await signWalletRequestObject(buildWalletRequestObject(session))
+  const jwt = await signWalletRequestObject(buildWalletRequestObject(session), walletRequestSigner, WALLET_REQUEST_AUDIENCE)
   res.setHeader('cache-control', 'no-store')
   res.setHeader('content-type', 'application/oauth-authz-req+jwt')
   res.send(jwt)
@@ -108,7 +109,11 @@ app.post('/wallet/request.jwt/:id', async (req, res) => {
       : typeof req.body?.walletNonce === 'string'
         ? req.body.walletNonce
         : undefined
-  const jwt = await signWalletRequestObject(buildWalletRequestObject(session, walletNonce))
+  const jwt = await signWalletRequestObject(
+    buildWalletRequestObject(session, walletNonce),
+    walletRequestSigner,
+    WALLET_REQUEST_AUDIENCE
+  )
   res.setHeader('cache-control', 'no-store')
   res.setHeader('content-type', 'application/oauth-authz-req+jwt')
   res.send(jwt)
@@ -479,25 +484,4 @@ async function resolveJwksUrl(issuer: string) {
     // Fall through to the direct JWKS well-known URL.
   }
   return new URL('/.well-known/jwks.json', issuer).toString()
-}
-
-async function signWalletRequestObject(payload: Record<string, unknown>) {
-  return await new SignJWT(payload)
-    .setProtectedHeader({
-      alg: 'ES256',
-      typ: 'oauth-authz-req+jwt',
-      kid: walletRequestKeys.publicJwk.kid
-    })
-    .setIssuer(String(payload.client_id || BASE_URL))
-    .setAudience(WALLET_REQUEST_AUDIENCE)
-    .setIssuedAt()
-    .setExpirationTime('10m')
-    .sign(walletRequestKeys.privateKey)
-}
-
-async function createWalletRequestKeys() {
-  const { publicKey, privateKey } = await generateKeyPair('ES256')
-  const publicJwk = await exportJWK(publicKey)
-  ;(publicJwk as any).kid = 'wallet-request-es256'
-  return { publicKey, privateKey, publicJwk }
 }

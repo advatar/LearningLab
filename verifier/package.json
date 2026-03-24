@@ -16,6 +16,7 @@
     "express": "^4.19.2",
     "jose": "^5.10.0",
     "qrcode": "^1.5.4",
+    "selfsigned": "^5.5.0",
     "telemetry": "workspace:*"
   },
   "devDependencies": {
