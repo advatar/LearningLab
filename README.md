@@ -30,6 +30,7 @@ Local terminal fallback:
   - `http://localhost:3001`
   - `http://localhost:3002`
 - These are service landing pages, not the full exercise flow.
+- If the external `app.github.dev` port URL looks stale, trust the `localhost` links from the Codespaces terminal.
 
 ## Labs
 

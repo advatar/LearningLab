@@ -239,3 +239,7 @@ Wallet verification notes
 - [x] Verify the issuer landing page and docs locally
 - [x] Publish the issuer landing-page update to the starter repos
 - [x] Commit and push the issuer landing-page update
+- [x] Document the `app.github.dev` forwarding fallback for stale Codespaces port pages
+- [x] Keep the source and template startup docs aligned for the forwarding fallback
+- [x] Verify the repo still builds after the forwarding-fallback doc update
+- [ ] Commit and push the forwarding-fallback doc update
