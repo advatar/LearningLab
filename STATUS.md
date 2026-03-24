@@ -267,3 +267,8 @@ Wallet verification notes
 - [x] Rebuild the student template and verify the JWKS clarification is included
 - [x] Publish the JWKS clarification to the starter repos
 - [x] Commit and push the JWKS clarification update
+- [x] Add the missing jose import guidance to the Lab 01 handout
+- [x] Add the missing jose import guidance to the issuer student stub
+- [x] Rebuild the student template and verify the import guidance is included
+- [x] Publish the import-guidance update to the starter repos
+- [ ] Commit and push the import-guidance update
