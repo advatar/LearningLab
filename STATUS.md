@@ -1,5 +1,10 @@
 # Status
 
+- [x] Replace the workshop verifier self-signed leaf with a CA root plus verifier leaf chain
+- [x] Update the iOS wallet trust anchor to the workshop CA root
+- [x] Update the Android wallet trust anchor to the workshop CA root
+- [x] Redeploy the verifier with the CA-signed leaf and verify the live wallet request chain
+
 - [x] Make the public wallet verifier use a stable x509 reader certificate across restarts
 - [x] Teach the iOS wallet fork to trust the workshop verifier certificate
 - [x] Teach the Android wallet fork to trust the workshop verifier certificate
