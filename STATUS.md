@@ -215,3 +215,8 @@ Wallet verification notes
 - [x] Verify the migrated template generation and course-ops config locally
 - [x] Publish the instructor and starter repos to `iProov-Education`
 - [x] Commit and push the `iProov-Education` migration updates
+- [x] Update the instructor-only Classroom invite config to the new `iProov-Education` assignment
+- [x] Patch the tracked coursework artifacts to the new Classroom invite and starter repo
+- [x] Verify the updated Classroom payload locally
+- [ ] Manually update the published Google Classroom post materials in the UI because Google Classroom API patch does not support `materials`
+- [x] Commit and push the Classroom invite update
