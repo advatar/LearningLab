@@ -338,3 +338,6 @@ Wallet verification notes
 - [x] Redeploy the public verifier with certificate-backed wallet request signing
 - [x] Verify the live wallet request JWT now includes an `x5c` header
 - [x] Commit and push the VM deployment status update
+- [x] Add preregistered OpenID4VP verifier config to the published iOS wallet fork
+- [x] Add preregistered OpenID4VP verifier config to the published Android wallet fork
+- [x] Verify the updated LearningLab wallet docs and repo build after the verifier-config fix

@@ -192,6 +192,7 @@ For this workshop, use these preregistered verifier values:
 
 Use those exact values in the wallet config files below.
 
+
 ## iOS track
 
 Wallet repo:
@@ -208,6 +209,7 @@ Key files:
 The cloned workshop iOS fork already contains:
 
 - the `IProov Enabled` and `IProov Issuer Base URL` keys in `Wallet.plist`
+- the preregistered `verifier.ipid.me` OpenID4VP entry in `WalletKitConfig.swift`
 - `IProovPresentationGate.swift`
 - the `eudi-wallet://iproov` callback handling in `DeepLinkController.swift`
 - the iProov Swift package dependency
@@ -328,6 +330,7 @@ Key files:
 
 The cloned workshop Android fork already contains:
 
+- the preregistered `verifier.ipid.me` OpenID4VP entry in `WalletCoreConfigImpl.kt`
 - `presentation-feature/.../IProovPresentationGate.kt`
 - the `eudi-wallet://iproov` callback path
 - the presentation-loading hook that pauses until the iProov step completes

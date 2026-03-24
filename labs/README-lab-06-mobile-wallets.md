@@ -153,6 +153,7 @@ That page gives you three things:
 
 If you are using your own backend instead of the workshop backend, open that verifier's `/wallet` page instead.
 
+
 ## Step 6: follow the platform runbook
 
 After cloning the wallet, open these in order:
