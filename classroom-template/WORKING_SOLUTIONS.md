@@ -44,6 +44,18 @@ Equivalent form:
 LAB_ID=03 pnpm classroom:check
 ```
 
+If you already have `pnpm dev` running in another terminal, use `--no-start` instead:
+
+```bash
+pnpm lab:check -- --lab 03 --no-start --verbose
+```
+
+If `3001` or `3002` are busy and you want an isolated smoke run, use different ports:
+
+```bash
+ISSUER_BASE_URL=http://127.0.0.1:3101 VERIFIER_BASE_URL=http://127.0.0.1:3102 pnpm lab:check -- --lab 03 --start --verbose
+```
+
 ## Important note
 
 - Lab 00 restores the starter scaffold.
