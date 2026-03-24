@@ -281,4 +281,4 @@ Wallet verification notes
 - [x] Add a student stub hint for minting and storing access_token and c_nonce
 - [x] Rebuild the student template and verify the token clarification is included
 - [x] Publish the token clarification to the starter repos
-- [ ] Commit and push the token clarification update
+- [x] Commit and push the token clarification update
