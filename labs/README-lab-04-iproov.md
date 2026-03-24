@@ -22,8 +22,21 @@ You do not need a full production integration.
 - Keep `pnpm dev` running.
 - Demo mode is acceptable for this lab.
 
-If you have real sandbox credentials, set the `IPROOV_*` values in `issuer/.env`.
-If you do not, use the demo-mode path and the webhook simulation below.
+If you have real sandbox credentials, set these in `issuer/.env`:
+
+```dotenv
+IPROOV_BASE_URL=https://us.rp.secure.iproov.me
+IPROOV_API_KEY=<your api key>
+IPROOV_SECRET=<your api secret>
+```
+
+Important:
+
+- `IPROOV_SECRET` is the normal real-credentials path
+- `IPROOV_MANAGEMENT_KEY` is only an alternate name this repo also accepts
+- `IPROOV_PASS_TOKEN` is demo-only and is not needed for the real sandbox flow
+
+If you do not have real sandbox credentials, leave the real-secret values unset and use the demo-mode path and webhook simulation below.
 
 ## Files you will edit
 

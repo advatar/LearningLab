@@ -52,7 +52,9 @@ Environment tracks
 
 Additional setup
 - iProov sandbox credentials available (use placeholders if demoing).
-- Set `IPROOV_BASE_URL`, `IPROOV_API_KEY`, `IPROOV_MANAGEMENT_KEY`, and `IPROOV_PASS_TOKEN` in `issuer/.env` for local demo work.
+- For real sandbox use, set `IPROOV_BASE_URL`, `IPROOV_API_KEY`, and `IPROOV_SECRET` in `issuer/.env`.
+- `IPROOV_MANAGEMENT_KEY` is only an alternate env name this repo also accepts.
+- `IPROOV_PASS_TOKEN` is demo-only and not needed for the real sandbox flow.
 
 Steps (edit + test)
 1) Add claim + webhook endpoints

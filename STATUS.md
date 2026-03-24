@@ -289,3 +289,8 @@ Wallet verification notes
 - [x] Rebuild the student template and verify all simplified lab handouts are included
 - [x] Publish the simplified lab handouts to the starter repos
 - [x] Commit and push the simplified lab-handout rewrite
+- [x] Clarify Lab 04 iProov environment variables for real versus demo mode
+- [x] Update example env docs so IPROOV_SECRET is the primary real-credentials path
+- [x] Rebuild the student template and verify the iProov env clarification is included
+- [x] Publish the iProov env clarification to the starter repos
+- [ ] Commit and push the iProov env clarification update
