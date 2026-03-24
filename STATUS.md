@@ -307,3 +307,9 @@ Wallet verification notes
 - [x] Rebuild the student template, verify the new wallet lesson, and run tests/build
 - [x] Publish the wallet-doc cleanup to the starter repos
 - [x] Commit and push the wallet-doc cleanup
+- [ ] Provision the Ubuntu VM runtime for public issuer/verifier hosting
+- [ ] Configure public issuer and verifier service env for `issuer.ipid.me` and `verifier.ipid.me`
+- [ ] Configure the RP request to ask for `age_over >= 21` and `nationality`
+- [ ] Install TLS reverse proxying for the public issuer/verifier domains
+- [ ] Smoke-test the public issuer and verifier endpoints
+- [ ] Commit and push the VM deployment status update

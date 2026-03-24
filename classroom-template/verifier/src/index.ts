@@ -13,6 +13,7 @@ import { decodeJwt, decodeProtectedHeader, importJWK, jwtVerify } from 'jose'
 import { base64ToBytes, verifyProof as verifyBbsProof } from 'bbs-lib'
 import { assertPassedIProovSession } from './iproov.js'
 import { shouldRequireIProovForBbsVerification } from './lab-compat.js'
+import { buildVpRequest } from './vp-request.js'
 
 dotenv.config()
 
@@ -57,14 +58,7 @@ app.get('/', (_req, res) => {
 app.get('/vp/request', (_req, res) => {
   const nonce = randomBytes(16).toString('base64url')
   vpNonces.set(nonce, Date.now() + VP_NONCE_TTL_MS)
-  const request = {
-    response_type: 'vp_token',
-    response_mode: 'direct_post',
-    client_id: BASE_URL,
-    nonce,
-    presentation_definition: { id: 'lab01', input_descriptors: [] }
-  }
-  res.json(request)
+  res.json(buildVpRequest(BASE_URL, nonce))
 })
 
 app.post('/verify', async (req, res) => {
