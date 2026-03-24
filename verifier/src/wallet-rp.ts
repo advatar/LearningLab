@@ -4,8 +4,9 @@ import QRCode from 'qrcode'
 const SESSION_TTL_MS = 15 * 60_000
 const QR_SIZE = 280
 const EUDI_PID_VCTS = ['urn:eudi:pid:1']
-const LAB_AGE_VCTS = ['https://example.org/vct/age-credential']
 const X509_SAN_DNS_CLIENT_ID_SCHEME = 'x509_san_dns'
+const PID_BIRTHDATE_CLAIMS = ['birthdate', 'birth_date'] as const
+const PID_NATIONALITY_CLAIMS = ['nationalities', 'nationality'] as const
 
 export type WalletVerifierProfile = {
   baseUrl: string
@@ -86,6 +87,11 @@ export type WalletRequestObject = {
   }
 }
 
+export type WalletClaimSummary = {
+  claims: Record<string, unknown>
+  over21Derived: boolean | null
+}
+
 export function deriveWalletVerifierProfile(baseUrl: string): WalletVerifierProfile {
   const url = new URL(baseUrl)
   return {
@@ -149,10 +155,22 @@ export function buildWalletRequestObject(session: WalletRpSession, walletNonce?:
 }
 
 export function buildWalletDcqlQuery() {
+  const pidBirthdateVariants = PID_BIRTHDATE_CLAIMS.flatMap((birthdateClaim) =>
+    PID_NATIONALITY_CLAIMS.map((nationalityClaim) => ({
+      id: `pid-${birthdateClaim}-and-${nationalityClaim}`,
+      format: 'dc+sd-jwt',
+      meta: { vct_values: EUDI_PID_VCTS },
+      claims: [
+        { id: birthdateClaim, path: [birthdateClaim] },
+        { id: nationalityClaim, path: [nationalityClaim] }
+      ]
+    }))
+  )
+
   return {
     credentials: [
       {
-        id: 'pid-over-21-and-nationality',
+        id: 'pid-age-over-21-and-nationality',
         format: 'dc+sd-jwt',
         meta: { vct_values: EUDI_PID_VCTS },
         claims: [
@@ -160,22 +178,50 @@ export function buildWalletDcqlQuery() {
           { id: 'nationality', path: ['nationality'] }
         ]
       },
-      {
-        id: 'learninglab-age-fallback',
-        format: 'dc+sd-jwt',
-        meta: { vct_values: LAB_AGE_VCTS },
-        claims: [
-          { id: 'age_over', path: ['age_over'] },
-          { id: 'residency', path: ['residency'] }
-        ]
-      }
+      ...pidBirthdateVariants
     ],
     credential_sets: [
       {
-        options: [['pid-over-21-and-nationality'], ['learninglab-age-fallback']],
-        purpose: 'Accept either a standard PID credential with age_over_21 + nationality or the LearningLab demo credential with age_over + residency.'
+        options: [
+          ['pid-age-over-21-and-nationality'],
+          ...pidBirthdateVariants.map((credential) => [credential.id])
+        ],
+        purpose:
+          'Accept a PID credential that either exposes age_over_21 directly or exposes birth date plus nationality so the verifier can derive the over-21 decision locally.'
       }
     ]
+  }
+}
+
+export function summarizeWalletClaims(claims: Record<string, unknown>, now = new Date()): WalletClaimSummary {
+  const normalized: Record<string, unknown> = { ...claims }
+  const nationalityValues = normalizeNationalityClaim(
+    claims.nationalities ?? claims.nationality
+  )
+  if (nationalityValues.length > 0) {
+    normalized.nationalities = nationalityValues
+    normalized.nationality = nationalityValues[0]
+  }
+
+  const birthdate = normalizeBirthdateClaim(claims.birthdate ?? claims.birth_date)
+  if (birthdate) {
+    normalized.birthdate = birthdate
+  }
+
+  const directAgeOver21 = normalizeBooleanClaim(claims.age_over_21)
+  const derivedAgeOver21 =
+    directAgeOver21 ?? (birthdate ? isAtLeast21(birthdate, now) : null)
+
+  if (derivedAgeOver21 !== null) {
+    normalized.age_over_21 = derivedAgeOver21
+  }
+  if (directAgeOver21 === null && birthdate) {
+    normalized.age_over_21_source = 'derived_from_birthdate'
+  }
+
+  return {
+    claims: normalized,
+    over21Derived: directAgeOver21 === null ? derivedAgeOver21 : null
   }
 }
 
@@ -214,7 +260,7 @@ export function extractPresentedCredentials(vpToken: unknown): string[] {
 export function renderWalletSessionPage(session: WalletRpSession, qrSvg: string) {
   const requestedClaims = [
     'Primary: age_over_21 + nationality from a PID SD-JWT VC',
-    'Fallback: age_over + residency from the LearningLab demo credential'
+    'Fallback: PID birthdate/birth_date + nationality/nationalities, with the over-21 decision derived by the verifier'
   ]
   const statusCopy =
     session.outcome.status === 'pending'
@@ -330,7 +376,7 @@ export function renderWalletSessionPage(session: WalletRpSession, qrSvg: string)
       <span class="pill">Wallet RP Session</span>
       <h1>Scan This QR Code With The Wallet</h1>
       <p>${escapeHtml(statusCopy)}</p>
-      <p>This verifier asks for proof that the holder is over 21 and for nationality. The fallback demo path accepts the LearningLab credential with <code>age_over</code> and <code>residency</code>.</p>
+      <p>This verifier asks for proof that the holder is over 21 and for nationality. If the PID exposes birth date instead of <code>age_over_21</code>, the verifier derives the over-21 result locally after receiving the presentation.</p>
     </section>
     <section class="grid">
       <article class="card">
@@ -394,4 +440,43 @@ function escapeHtml(value: string) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;')
+}
+
+function normalizeNationalityClaim(value: unknown) {
+  if (Array.isArray(value)) {
+    return value.filter((item): item is string => typeof item === 'string' && item.trim().length > 0)
+  }
+  if (typeof value === 'string' && value.trim().length > 0) {
+    return [value.trim()]
+  }
+  return []
+}
+
+function normalizeBirthdateClaim(value: unknown) {
+  if (typeof value !== 'string') return null
+  const trimmed = value.trim()
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) return null
+  return trimmed
+}
+
+function normalizeBooleanClaim(value: unknown) {
+  if (typeof value === 'boolean') return value
+  if (typeof value === 'string') {
+    const normalized = value.trim().toLowerCase()
+    if (['true', 'yes', 'y', '1'].includes(normalized)) return true
+    if (['false', 'no', 'n', '0'].includes(normalized)) return false
+  }
+  return null
+}
+
+function isAtLeast21(birthdate: string, now: Date) {
+  const date = new Date(`${birthdate}T00:00:00Z`)
+  if (Number.isNaN(date.getTime())) return null
+  let years = now.getUTCFullYear() - date.getUTCFullYear()
+  const monthDelta = now.getUTCMonth() - date.getUTCMonth()
+  const dayDelta = now.getUTCDate() - date.getUTCDate()
+  if (monthDelta < 0 || (monthDelta === 0 && dayDelta < 0)) {
+    years -= 1
+  }
+  return years >= 21
 }

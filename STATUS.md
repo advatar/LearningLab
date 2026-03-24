@@ -5,6 +5,7 @@
 - [ ] Implement the minimal trust-path fix and verify the live wallet flow
 - [x] Add iOS wallet runtime logging for the workshop trust anchor
 - [ ] Verify the iOS wallet exposes the expected workshop root fingerprint in logs
+- [ ] Align the wallet verifier request with the claim names exposed by the EUDI PID wallet
 
 - [x] Replace the workshop verifier self-signed leaf with a CA root plus verifier leaf chain
 - [x] Update the iOS wallet trust anchor to the workshop CA root

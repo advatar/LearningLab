@@ -4,7 +4,8 @@ import {
   buildWalletRequestObject,
   createWalletSession,
   extractPresentedCredentials,
-  normalizeWalletDirectPostBody
+  normalizeWalletDirectPostBody,
+  summarizeWalletClaims
 } from '../src/wallet-rp.ts'
 
 test('createWalletSession builds an x509 SAN DNS deep link for the public verifier', () => {
@@ -22,7 +23,7 @@ test('createWalletSession builds an x509 SAN DNS deep link for the public verifi
   )
 })
 
-test('buildWalletRequestObject asks for over-21 plus nationality with a fallback credential', () => {
+test('buildWalletRequestObject asks for supported PID claim variants that prove over-21 plus nationality', () => {
   const session = createWalletSession('https://verifier.ipid.me')
   const request = buildWalletRequestObject(session)
 
@@ -33,9 +34,9 @@ test('buildWalletRequestObject asks for over-21 plus nationality with a fallback
   assert.equal(request.response_mode, 'direct_post')
   assert.equal(request.nonce, session.nonce)
   assert.equal(request.state, session.state)
-  assert.equal(request.dcql_query.credentials.length, 2)
+  assert.equal(request.dcql_query.credentials.length, 5)
 
-  const primary = request.dcql_query.credentials.find((credential) => credential.id === 'pid-over-21-and-nationality')
+  const primary = request.dcql_query.credentials.find((credential) => credential.id === 'pid-age-over-21-and-nationality')
   assert.ok(primary)
   assert.deepEqual(primary.meta.vct_values, ['urn:eudi:pid:1'])
   assert.deepEqual(primary.claims, [
@@ -43,17 +44,50 @@ test('buildWalletRequestObject asks for over-21 plus nationality with a fallback
     { id: 'nationality', path: ['nationality'] }
   ])
 
-  const fallback = request.dcql_query.credentials.find((credential) => credential.id === 'learninglab-age-fallback')
-  assert.ok(fallback)
-  assert.deepEqual(fallback.meta.vct_values, ['https://example.org/vct/age-credential'])
-  assert.deepEqual(fallback.claims, [
-    { id: 'age_over', path: ['age_over'] },
-    { id: 'residency', path: ['residency'] }
+  const birthdateVariant = request.dcql_query.credentials.find((credential) => credential.id === 'pid-birthdate-and-nationalities')
+  assert.ok(birthdateVariant)
+  assert.deepEqual(birthdateVariant.meta.vct_values, ['urn:eudi:pid:1'])
+  assert.deepEqual(birthdateVariant.claims, [
+    { id: 'birthdate', path: ['birthdate'] },
+    { id: 'nationalities', path: ['nationalities'] }
+  ])
+
+  assert.deepEqual(request.dcql_query.credential_sets, [
+    {
+      options: [
+        ['pid-age-over-21-and-nationality'],
+        ['pid-birthdate-and-nationalities'],
+        ['pid-birthdate-and-nationality'],
+        ['pid-birth_date-and-nationalities'],
+        ['pid-birth_date-and-nationality']
+      ],
+      purpose:
+        'Accept a PID credential that either exposes age_over_21 directly or exposes birth date plus nationality so the verifier can derive the over-21 decision locally.'
+    }
   ])
 
   assert.deepEqual(request.client_metadata.vp_formats_supported['dc+sd-jwt'], {
     'sd-jwt_alg_values': ['ES256'],
     'kb-jwt_alg_values': ['ES256']
+  })
+})
+
+test('summarizeWalletClaims derives over-21 from birthdate and normalizes nationalities', () => {
+  const summary = summarizeWalletClaims(
+    {
+      birthdate: '1994-10-21',
+      nationalities: ['SE']
+    },
+    new Date('2026-03-24T00:00:00Z')
+  )
+
+  assert.equal(summary.over21Derived, true)
+  assert.deepEqual(summary.claims, {
+    birthdate: '1994-10-21',
+    nationalities: ['SE'],
+    nationality: 'SE',
+    age_over_21: true,
+    age_over_21_source: 'derived_from_birthdate'
   })
 })
 

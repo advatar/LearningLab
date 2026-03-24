@@ -22,6 +22,7 @@ import {
   normalizeWalletDirectPostBody,
   renderWalletQrSvg,
   renderWalletSessionPage,
+  summarizeWalletClaims,
   type WalletDirectPostBody,
   type WalletRpOutcome,
   type WalletRpSession
@@ -314,6 +315,10 @@ async function evaluateWalletDirectPost(session: WalletRpSession, body: WalletDi
     expectedAudience: session.clientId,
     expectedNonce: session.nonce
   })
+  const summarizedClaims = summarizeWalletClaims(result.claims)
+  const warningParts = []
+  if ('warning' in result && result.warning) warningParts.push(result.warning)
+  if (summarizedClaims.over21Derived !== null) warningParts.push('age_over_21 derived from PID birthdate')
 
   return {
     status: 'complete',
@@ -321,12 +326,12 @@ async function evaluateWalletDirectPost(session: WalletRpSession, body: WalletDi
     mode: result.mode,
     issuer: typeof result.payload?.iss === 'string' ? result.payload.iss : undefined,
     vct: typeof result.payload?.vct === 'string' ? result.payload.vct : undefined,
-    claims: result.claims,
+    claims: summarizedClaims.claims,
     kbJwt: result.keyBinding ?? null,
     payload: result.payload,
     presentationSubmission: body.presentation_submission,
     raw,
-    warning: 'warning' in result ? result.warning : undefined
+    warning: warningParts.length > 0 ? warningParts.join(' | ') : undefined
   }
 }
 
