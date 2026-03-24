@@ -1,5 +1,9 @@
 # Status
 
+- [x] Add the missing `client_id_scheme=pre-registered` fields to the wallet verifier flow
+- [x] Verify the wallet verifier request shape locally with tests
+- [x] Redeploy the public verifier and confirm the live wallet request JWT includes the preregistered client ID scheme
+
 - [x] Add a local demo-conductor package for the Village speed-build presentation
 - [x] Verify the demo-conductor build and unit tests locally
 - [x] Commit the demo-conductor changes

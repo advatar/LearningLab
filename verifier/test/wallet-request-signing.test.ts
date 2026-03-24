@@ -28,6 +28,7 @@ test('wallet request signer embeds an x5c certificate for verifier.ipid.me', asy
   })
 
   assert.equal(verified.payload.client_id, 'verifier.ipid.me')
+  assert.equal(verified.payload.client_id_scheme, 'pre-registered')
   assert.equal(verified.payload.response_mode, 'direct_post')
 })
 

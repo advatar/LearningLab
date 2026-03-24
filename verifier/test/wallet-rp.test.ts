@@ -17,7 +17,7 @@ test('createWalletSession builds a preregistered deep link for the public verifi
   assert.match(session.resultUri, /^https:\/\/verifier\.ipid\.me\/wallet\/session\//)
   assert.match(
     session.deepLink,
-    /^eudi-openid4vp:\/\/verifier\.ipid\.me\?client_id=verifier\.ipid\.me&request_uri=https%3A%2F%2Fverifier\.ipid\.me%2Fwallet%2Frequest\.jwt%2F/
+    /^eudi-openid4vp:\/\/verifier\.ipid\.me\?client_id=verifier\.ipid\.me&client_id_scheme=pre-registered&request_uri=https%3A%2F%2Fverifier\.ipid\.me%2Fwallet%2Frequest\.jwt%2F/
   )
 })
 
@@ -26,6 +26,7 @@ test('buildWalletRequestObject asks for over-21 plus nationality with a fallback
   const request = buildWalletRequestObject(session)
 
   assert.equal(request.client_id, 'verifier.ipid.me')
+  assert.equal(request.client_id_scheme, 'pre-registered')
   assert.equal(request.response_uri, session.responseUri)
   assert.equal(request.response_type, 'vp_token')
   assert.equal(request.response_mode, 'direct_post')

@@ -5,6 +5,7 @@ const SESSION_TTL_MS = 15 * 60_000
 const QR_SIZE = 280
 const EUDI_PID_VCTS = ['urn:eudi:pid:1']
 const LAB_AGE_VCTS = ['https://example.org/vct/age-credential']
+const PREREGISTERED_CLIENT_ID_SCHEME = 'pre-registered'
 
 export type WalletVerifierProfile = {
   baseUrl: string
@@ -55,6 +56,7 @@ export type WalletDirectPostBody = {
 
 export type WalletRequestObject = {
   client_id: string
+  client_id_scheme: 'pre-registered'
   response_uri: string
   response_type: 'vp_token'
   response_mode: 'direct_post'
@@ -117,12 +119,13 @@ export function createWalletSession(baseUrl: string, now = Date.now()): WalletRp
 }
 
 export function buildWalletDeepLink(clientId: string, requestUri: string) {
-  return `eudi-openid4vp://${clientId}?client_id=${encodeURIComponent(clientId)}&request_uri=${encodeURIComponent(requestUri)}`
+  return `eudi-openid4vp://${clientId}?client_id=${encodeURIComponent(clientId)}&client_id_scheme=${encodeURIComponent(PREREGISTERED_CLIENT_ID_SCHEME)}&request_uri=${encodeURIComponent(requestUri)}`
 }
 
 export function buildWalletRequestObject(session: WalletRpSession, walletNonce?: string): WalletRequestObject & { wallet_nonce?: string } {
   return {
     client_id: session.clientId,
+    client_id_scheme: PREREGISTERED_CLIENT_ID_SCHEME,
     response_uri: session.responseUri,
     response_type: 'vp_token',
     response_mode: 'direct_post',
