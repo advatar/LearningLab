@@ -14,12 +14,27 @@ import { base64ToBytes, verifyProof as verifyBbsProof } from 'bbs-lib'
 import { assertPassedIProovSession } from './iproov.js'
 import { shouldRequireIProovForBbsVerification } from './lab-compat.js'
 import { buildVpRequest } from './vp-request.js'
+import { inspectMdocCredential, looksLikeMdocDeviceResponse } from './wallet-mdoc.js'
+import { createWalletRequestSigner, signWalletRequestObject } from './wallet-request-signing.js'
+import {
+  buildWalletRequestObject,
+  createWalletSession,
+  extractPresentedCredentials,
+  normalizeWalletDirectPostBody,
+  renderWalletQrSvg,
+  renderWalletSessionPage,
+  summarizeWalletClaims,
+  type WalletDirectPostBody,
+  type WalletRpOutcome,
+  type WalletRpSession
+} from './wallet-rp.js'
 
 dotenv.config()
 
 const app = express()
 app.use(cors())
 app.use(express.json({ limit: '1mb' }))
+app.use(express.urlencoded({ extended: false, limit: '1mb' }))
 
 const PORT = Number(process.env.VERIFIER_PORT || 3002)
 const BASE_URL = process.env.VERIFIER_BASE_URL || `http://localhost:${PORT}`
@@ -31,13 +46,16 @@ const USE_OHTTP = String(process.env.USE_OHTTP || 'false') === 'true'
 const OHTTP_RELAY_URL = process.env.OHTTP_RELAY_URL || ''
 const STATUS_LIST_ID = process.env.STATUS_LIST_ID || '1'
 const STATUS_LIST_URL = process.env.STATUS_LIST_URL || `${ISSUER_BASE_URL}/statuslist/${STATUS_LIST_ID}.json`
+const WALLET_REQUEST_AUDIENCE = 'https://self-issued.me/v2'
 // LAB_ID is injected by the lesson runner. Normal integrated runs leave it unset.
 const ACTIVE_LAB_ID = process.env.LAB_ID
 
 let lastPresentation: any = null
-let cachedJwks: any = null
+const cachedJwks = new Map<string, any>()
 let cachedBbsPublicKey: Uint8Array | null = null
 const vpNonces = new Map<string, number>()
+const walletSessions = new Map<string, WalletRpSession>()
+const walletRequestSigner = await createWalletRequestSigner(BASE_URL)
 
 app.get('/', (_req, res) => {
   res.setHeader('content-type', 'text/html').send(`<!doctype html>
@@ -51,6 +69,7 @@ app.get('/', (_req, res) => {
 <body>
   <h1>Verifier (Lab 05: OHTTP + Revocation)</h1>
   <p>POST <code>/verify</code> with SD-JWT or BBS payloads. Outbound fetches use the relay when <code>USE_OHTTP=true</code>; revocation is enforced via the Bitstring Status List.</p>
+  <p>Wallet-facing RP demo: <a href="/wallet"><code>/wallet</code></a></p>
 </body>
 </html>`)
 })
@@ -59,6 +78,65 @@ app.get('/vp/request', (_req, res) => {
   const nonce = randomBytes(16).toString('base64url')
   vpNonces.set(nonce, Date.now() + VP_NONCE_TTL_MS)
   res.json(buildVpRequest(BASE_URL, nonce))
+})
+
+app.get('/wallet', (_req, res) => {
+  const session = createWalletSession(BASE_URL)
+  walletSessions.set(session.id, session)
+  res.redirect(`/wallet/session/${session.id}`)
+})
+
+app.get('/wallet/session/:id', async (req, res) => {
+  const session = walletSessions.get(req.params.id)
+  if (!session) return res.status(404).json({ ok: false, error: 'wallet_session_not_found' })
+  const qrSvg = await renderWalletQrSvg(session.deepLink)
+  res.setHeader('content-type', 'text/html').send(renderWalletSessionPage(session, qrSvg))
+})
+
+app.get('/wallet/request.jwt/:id', async (req, res) => {
+  const session = walletSessions.get(req.params.id)
+  if (!session) return res.status(404).json({ ok: false, error: 'wallet_session_not_found' })
+  const jwt = await signWalletRequestObject(buildWalletRequestObject(session), walletRequestSigner, WALLET_REQUEST_AUDIENCE)
+  res.setHeader('cache-control', 'no-store')
+  res.setHeader('content-type', 'application/oauth-authz-req+jwt')
+  res.send(jwt)
+})
+
+app.post('/wallet/request.jwt/:id', async (req, res) => {
+  const session = walletSessions.get(req.params.id)
+  if (!session) return res.status(404).json({ ok: false, error: 'wallet_session_not_found' })
+  const walletNonce =
+    typeof req.body?.wallet_nonce === 'string'
+      ? req.body.wallet_nonce
+      : typeof req.body?.walletNonce === 'string'
+        ? req.body.walletNonce
+        : undefined
+  const jwt = await signWalletRequestObject(
+    buildWalletRequestObject(session, walletNonce),
+    walletRequestSigner,
+    WALLET_REQUEST_AUDIENCE
+  )
+  res.setHeader('cache-control', 'no-store')
+  res.setHeader('content-type', 'application/oauth-authz-req+jwt')
+  res.send(jwt)
+})
+
+app.post('/wallet/direct_post/:id', async (req, res) => {
+  const session = walletSessions.get(req.params.id)
+  if (!session) return res.status(404).json({ ok: false, error: 'wallet_session_not_found' })
+  const body = normalizeWalletDirectPostBody(req.body)
+  session.outcome = await evaluateWalletDirectPost(session, body)
+  walletSessions.set(session.id, session)
+  lastPresentation = {
+    format: 'wallet-vp',
+    receivedAt: session.outcome.receivedAt || new Date().toISOString(),
+    result: session.outcome,
+    raw: body
+  }
+  res
+    .status(200)
+    .setHeader('cache-control', 'no-store')
+    .json({ redirect_uri: session.resultUri })
 })
 
 app.post('/verify', async (req, res) => {
@@ -131,38 +209,7 @@ async function verifyBbsPresentation(body: any) {
 
 async function verifySdJwtPresentation(body: any) {
   const credential = String(body.credential || '')
-  const [sdJwt, ...disclosures] = credential.split('~')
-  if (!sdJwt || disclosures.length === 0) throw new Error('missing_disclosures')
-
-  const jwks = await fetchJwks()
-  const protectedHeader = decodeProtectedHeader(sdJwt)
-  if (!protectedHeader.kid && jwks.keys?.length) {
-    protectedHeader.kid = jwks.keys[0].kid
-  }
-  const key = jwks.keys.find((k: any) => !protectedHeader.kid || k.kid === protectedHeader.kid)
-  if (!key) throw new Error('jwks_key_not_found')
-
-  const { payload } = await jwtVerify(sdJwt, await importJWK(key, 'ES256'), {
-    audience: [BASE_URL, ISSUER_BASE_URL, `${ISSUER_BASE_URL}/credential`]
-  })
-
-  const hashed = disclosures.map((d: string) => hashDisclosure(d))
-  const sdArray = (payload as any)._sd || []
-  for (const h of hashed) {
-    if (!sdArray.includes(h)) throw new Error('disclosure_mismatch')
-  }
-
-  const claims: Record<string, any> = {}
-  for (const d of disclosures) {
-    const [_, name, value] = parseDisclosure(d)
-    claims[name] = value
-  }
-
-  if ((payload as any).credentialStatus) {
-    await ensureNotRevoked((payload as any).credentialStatus)
-  }
-
-  return { payload, claims }
+  return await verifySdJwtCredential(credential)
 }
 
 function hashDisclosure(disclosure: string) {
@@ -179,11 +226,7 @@ function parseDisclosure(disclosure: string): [string, string, any] {
 }
 
 async function fetchJwks() {
-  if (cachedJwks) return cachedJwks
-  const res = await fetchViaRelay(ISSUER_JWKS_URL)
-  if (!res.ok) throw new Error(`jwks_fetch_failed ${res.status}`)
-  cachedJwks = await res.json()
-  return cachedJwks
+  return await fetchJwksForIssuer(ISSUER_BASE_URL)
 }
 
 async function fetchBbsPublicKey() {
@@ -232,4 +275,236 @@ function isBitSet(buffer: Buffer, index: number) {
   const bitOffset = index % 8
   if (byteIndex >= buffer.length) return false
   return (buffer[byteIndex] & (1 << bitOffset)) > 0
+}
+
+async function evaluateWalletDirectPost(session: WalletRpSession, body: WalletDirectPostBody): Promise<WalletRpOutcome> {
+  const receivedAt = new Date().toISOString()
+  const raw = body as Record<string, unknown>
+  if (typeof body.error === 'string') {
+    return {
+      status: 'error',
+      receivedAt,
+      error: body.error,
+      errorDescription: typeof body.error_description === 'string' ? body.error_description : undefined,
+      presentationSubmission: body.presentation_submission,
+      raw
+    }
+  }
+  if (typeof body.state === 'string' && body.state !== session.state) {
+    return {
+      status: 'error',
+      receivedAt,
+      error: 'state_mismatch',
+      errorDescription: `Expected ${session.state} but got ${body.state}`,
+      presentationSubmission: body.presentation_submission,
+      raw
+    }
+  }
+
+  const credentials = extractPresentedCredentials(body.vp_token)
+  if (credentials.length === 0) {
+    return {
+      status: 'error',
+      receivedAt,
+      error: 'missing_vp_token',
+      presentationSubmission: body.presentation_submission,
+      raw
+    }
+  }
+
+  const result = await inspectWalletPresentation(credentials[0], {
+    expectedAudience: session.clientId,
+    expectedNonce: session.nonce
+  })
+  const summarizedClaims = summarizeWalletClaims(result.claims)
+  const warningParts = []
+  if ('warning' in result && result.warning) warningParts.push(result.warning)
+  if (summarizedClaims.over21Derived !== null) warningParts.push('age_over_21 derived from PID birthdate')
+
+  return {
+    status: 'complete',
+    receivedAt,
+    mode: result.mode,
+    issuer: typeof result.payload?.iss === 'string' ? result.payload.iss : undefined,
+    vct:
+      typeof result.payload?.vct === 'string'
+        ? result.payload.vct
+        : typeof result.payload?.docType === 'string'
+          ? result.payload.docType
+          : undefined,
+    claims: summarizedClaims.claims,
+    kbJwt: result.keyBinding ?? null,
+    payload: result.payload,
+    presentationSubmission: body.presentation_submission,
+    raw,
+    warning: warningParts.length > 0 ? warningParts.join(' | ') : undefined
+  }
+}
+
+async function inspectWalletPresentation(
+  credential: string,
+  options: { expectedAudience?: string; expectedNonce?: string }
+) {
+  if (looksLikeMdocDeviceResponse(credential)) {
+    return {
+      ...inspectMdocCredential(credential),
+      mode: 'inspected' as const
+    }
+  }
+  try {
+    const verified = await verifySdJwtCredential(credential, options)
+    return { ...verified, mode: 'verified' as const }
+  } catch (error: any) {
+    if (looksLikeMdocDeviceResponse(credential)) {
+      return {
+        ...inspectMdocCredential(credential),
+        mode: 'inspected' as const
+      }
+    }
+    const inspected = inspectSdJwtCredential(credential)
+    return {
+      ...inspected,
+      mode: 'inspected' as const,
+      warning: error?.message || 'inspection_only'
+    }
+  }
+}
+
+async function verifySdJwtCredential(
+  credential: string,
+  options: { expectedAudience?: string; expectedNonce?: string } = {}
+) {
+  const { sdJwt, disclosures, keyBindingJwt } = splitPresentedSdJwt(credential)
+  const preview = decodeJwt(sdJwt) as Record<string, unknown>
+  const issuer = typeof preview.iss === 'string' ? preview.iss : ISSUER_BASE_URL
+  const jwks = await fetchJwksForIssuer(issuer)
+  const protectedHeader = decodeProtectedHeader(sdJwt)
+  if (!protectedHeader.kid && jwks.keys?.length) {
+    protectedHeader.kid = jwks.keys[0].kid
+  }
+  const key = jwks.keys.find((candidate: any) => !protectedHeader.kid || candidate.kid === protectedHeader.kid)
+  if (!key) throw new Error('jwks_key_not_found')
+
+  const verifyOptions: Record<string, unknown> = {}
+  if (issuer) verifyOptions.issuer = issuer
+  const { payload } = await jwtVerify(
+    sdJwt,
+    await importJWK(key, typeof protectedHeader.alg === 'string' ? protectedHeader.alg : 'ES256'),
+    verifyOptions
+  )
+
+  const hashed = disclosures.map((item) => hashDisclosure(item))
+  const sdArray = (payload as any)._sd || []
+  for (const hash of hashed) {
+    if (!sdArray.includes(hash)) throw new Error('disclosure_mismatch')
+  }
+
+  const claims = disclosures.reduce<Record<string, unknown>>((acc, disclosure) => {
+    const [, name, value] = parseDisclosure(disclosure)
+    acc[name] = value
+    return acc
+  }, {})
+
+  if ((payload as any).credentialStatus) {
+    await ensureNotRevoked((payload as any).credentialStatus)
+  }
+
+  let keyBinding: Record<string, unknown> | null = null
+  if (keyBindingJwt) {
+    keyBinding = await verifyKeyBindingJwt(keyBindingJwt, payload as Record<string, unknown>, options)
+  }
+
+  return { payload: payload as Record<string, unknown>, claims, keyBinding }
+}
+
+function inspectSdJwtCredential(credential: string) {
+  const { sdJwt, disclosures, keyBindingJwt } = splitPresentedSdJwt(credential)
+  const payload = decodeJwt(sdJwt) as Record<string, unknown>
+  const claims = disclosures.reduce<Record<string, unknown>>((acc, disclosure) => {
+    const [, name, value] = parseDisclosure(disclosure)
+    acc[name] = value
+    return acc
+  }, {})
+  const keyBinding = keyBindingJwt ? (decodeJwt(keyBindingJwt) as Record<string, unknown>) : null
+  return { payload, claims, keyBinding }
+}
+
+async function verifyKeyBindingJwt(
+  keyBindingJwt: string,
+  payload: Record<string, unknown>,
+  options: { expectedAudience?: string; expectedNonce?: string }
+) {
+  const holderJwk = (payload as any).cnf?.jwk
+  if (!holderJwk) throw new Error('holder_jwk_missing')
+  const protectedHeader = decodeProtectedHeader(keyBindingJwt)
+  const verifyOptions: Record<string, unknown> = {}
+  if (options.expectedAudience) {
+    verifyOptions.audience = options.expectedAudience
+  }
+  const { payload: keyBindingPayload } = await jwtVerify(
+    keyBindingJwt,
+    await importJWK(holderJwk, typeof protectedHeader.alg === 'string' ? protectedHeader.alg : 'ES256'),
+    verifyOptions
+  )
+  if (options.expectedNonce && keyBindingPayload.nonce !== options.expectedNonce) {
+    throw new Error('kb_nonce_mismatch')
+  }
+  return keyBindingPayload as Record<string, unknown>
+}
+
+function splitPresentedSdJwt(credential: string) {
+  const segments = credential.split('~').filter(Boolean)
+  const [sdJwt, ...tail] = segments
+  if (!sdJwt) throw new Error('missing_sd_jwt')
+  const disclosures: string[] = []
+  let keyBindingJwt: string | null = null
+  for (const segment of tail) {
+    if (!keyBindingJwt && looksLikeJwt(segment) && !isDisclosure(segment)) {
+      keyBindingJwt = segment
+      continue
+    }
+    disclosures.push(segment)
+  }
+  if (disclosures.length === 0) throw new Error('missing_disclosures')
+  return { sdJwt, disclosures, keyBindingJwt }
+}
+
+function looksLikeJwt(value: string) {
+  return value.split('.').length === 3
+}
+
+function isDisclosure(value: string) {
+  try {
+    parseDisclosure(value)
+    return true
+  } catch {
+    return false
+  }
+}
+
+async function fetchJwksForIssuer(issuer: string) {
+  const jwksUrl = await resolveJwksUrl(issuer)
+  if (cachedJwks.has(jwksUrl)) return cachedJwks.get(jwksUrl)
+  const res = await fetchViaRelay(jwksUrl)
+  if (!res.ok) throw new Error(`jwks_fetch_failed ${res.status}`)
+  const json = await res.json()
+  cachedJwks.set(jwksUrl, json)
+  return json
+}
+
+async function resolveJwksUrl(issuer: string) {
+  if (!issuer || issuer === ISSUER_BASE_URL) return ISSUER_JWKS_URL
+  try {
+    const metadataUrl = new URL('/.well-known/openid-credential-issuer', issuer).toString()
+    const res = await fetchViaRelay(metadataUrl)
+    if (res.ok) {
+      const metadata = await res.json()
+      if (typeof metadata.jwks_uri === 'string' && metadata.jwks_uri) {
+        return metadata.jwks_uri
+      }
+    }
+  } catch {
+    // Fall through to the direct JWKS well-known URL.
+  }
+  return new URL('/.well-known/jwks.json', issuer).toString()
 }

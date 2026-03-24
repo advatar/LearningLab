@@ -1,5 +1,9 @@
 # Status
 
+- [x] QA the student-facing Learning Lab instructions for conference use
+- [x] Verify whether students can see solution material in the student-facing repo/template
+- [x] Run the full unit and smoke-test sweep for the Learning Lab repo
+- [x] Tighten any unclear student-facing instructions found during QA
 - [x] Diagnose the iOS wallet repeat-share failure after the first QR presentation succeeds
 - [x] Fix the PIN-entry empty SF Symbol warning in the iOS wallet
 - [x] Fix remote/proximity presentation cleanup so a second scan starts from a clean coordinator state
