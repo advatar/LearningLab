@@ -218,6 +218,9 @@ Wallet verification notes
 - [x] Update the instructor-only Classroom invite config to the new `iProov-Education` assignment
 - [x] Patch the tracked coursework artifacts to the new Classroom invite and starter repo
 - [x] Verify the updated Classroom payload locally
+- [x] Add speaker notes to the LAB2 RSAC deck that reflect the current integrated repo
+- [x] Call out repo/codebase differences versus the lesson flow, including components students do not modify in Labs 00-05
+- [x] Verify the deck notes were written successfully, then commit and push only the deck and status updates
 - [ ] Manually update the published Google Classroom post materials in the UI because Google Classroom API patch does not support `materials`
 - [x] Commit and push the Classroom invite update
 - [x] Add the pending repository-invitation step to the attendee onboarding docs
