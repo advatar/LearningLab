@@ -41,6 +41,7 @@ Local terminal fallback:
 - Lab 04: [labs/README-lab-04-iproov.md](labs/README-lab-04-iproov.md)
 - Lab 05: [labs/README-lab-05-revocation.md](labs/README-lab-05-revocation.md)
 - Optional Lab 06: [labs/README-lab-06-mobile-wallets.md](labs/README-lab-06-mobile-wallets.md) for the laptop-only mobile wallet track
+- Public wallet RP demo: `https://verifier.ipid.me/wallet`
 
 ## Docs
 

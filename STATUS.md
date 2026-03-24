@@ -258,6 +258,11 @@ Wallet verification notes
 - [x] Rebuild the student templates and verify the section marker is present
 - [x] Publish the section-marker update to the starter repos
 - [x] Commit and push the section-marker update
+- [x] Add a wallet-facing verifier RP flow with a QR/deep-link landing page
+- [x] Add a request URI endpoint and direct-post receiver for the wallet RP flow
+- [x] Add verifier tests for the wallet RP request/session helpers
+- [x] Update the wallet/student docs to point at the public RP URLs and preregistered verifier settings
+- [ ] Verify the wallet RP flow locally and redeploy it to the public VM
 - [x] Simplify the Lab 01 handout into a shorter student-first flow
 - [x] Rebuild the student template and verify the simplified Lab 01 handout is included
 - [x] Publish the simplified Lab 01 handout to the starter repos

@@ -84,9 +84,15 @@ If the script tells you that you are in Codespaces, stop and rerun it from a loc
 
 ## Step 3: choose the backend URL
 
-There is no single fixed class URL baked into the repo.
+For this workshop, use the public backend by default unless an instructor tells you otherwise:
 
-Use whichever issuer URL your wallet can actually reach:
+- issuer: `https://issuer.ipid.me`
+- verifier API: `https://verifier.ipid.me`
+- wallet RP page: `https://verifier.ipid.me/wallet`
+
+Only fall back to a Codespaces or laptop URL if you are explicitly testing your own backend.
+
+Other supported backend options:
 
 - backend in Codespaces:
   - copy the forwarded Port `3001` URL from the `PORTS` panel
@@ -96,11 +102,13 @@ Use whichever issuer URL your wallet can actually reach:
   - Android emulator: `http://10.0.2.2:3001`
   - physical device on the same Wi-Fi: `http://<your-mac-lan-ip>:3001`
 - shared workshop backend:
-  - use the public HTTPS issuer URL the instructor gives you
+  - issuer: `https://issuer.ipid.me`
+  - verifier: `https://verifier.ipid.me`
+  - RP page: `https://verifier.ipid.me/wallet`
 
 Only use `localhost` when the issuer is running on the same laptop as the simulator.
 
-If you also need the verifier URL, use the same rule with Port `3002`.
+If you need the verifier URL directly, use the same rule with Port `3002`.
 
 ## Step 4: make sure the backend is alive
 
@@ -125,7 +133,23 @@ Interpret `/iproov/config` like this:
   - the issuer has real iProov credentials
   - the iOS native SDK path can be used on a physical iPhone
 
-## Step 5: follow the platform runbook
+## Step 5: open the wallet RP page
+
+On your laptop, open:
+
+```text
+https://verifier.ipid.me/wallet
+```
+
+That page gives you three things:
+
+- the QR code to scan with the wallet
+- the exact verifier client settings for preregistered mode
+- the live result page that shows whether the presentation was received
+
+If you are using your own backend instead of the workshop backend, open that verifier's `/wallet` page instead.
+
+## Step 6: follow the platform runbook
 
 After cloning the wallet, open:
 
@@ -137,6 +161,7 @@ Use that runbook for:
 - the exact vanilla-wallet patch points to inspect
 - iOS and Android setup
 - where to paste the issuer base URL
+- where to paste the verifier preregistration values
 - expected iProov flow
 - troubleshooting
 
