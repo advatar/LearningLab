@@ -262,3 +262,8 @@ Wallet verification notes
 - [x] Rebuild the student template and verify the simplified Lab 01 handout is included
 - [x] Publish the simplified Lab 01 handout to the starter repos
 - [x] Commit and push the simplified Lab 01 handout update
+- [x] Explain in Lab 01 where the issuer public JWK comes from
+- [x] Add a student stub hint for generating issuer signing keys at startup
+- [x] Rebuild the student template and verify the JWKS clarification is included
+- [x] Publish the JWKS clarification to the starter repos
+- [ ] Commit and push the JWKS clarification update

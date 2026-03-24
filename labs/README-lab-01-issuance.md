@@ -35,10 +35,45 @@ If you do not, use the `POST /credential-offers`, `POST /token`, and `POST /cred
 
 Implement `GET /.well-known/jwks.json`.
 
+The missing idea here is: you need an issuer signing keypair before this route can return anything useful.
+
+Create that keypair once at startup near the top of `issuer/src/index.ts`:
+
+- generate an ES256 keypair
+- keep the private key for signing credentials later
+- export the public key as a JWK
+- save all of that in something like `issuerKeys`
+
+In plain English:
+
+- `issuerKeys.privateKey` is used later when you sign the SD-JWT
+- `issuerKeys.publicJwk` is what this route returns to the verifier
+
+The minimal shape is:
+
+```ts
+const issuerKeys = await createIssuerKeys()
+
+async function createIssuerKeys() {
+  const { publicKey, privateKey } = await generateKeyPair('ES256')
+  const publicJwk = await exportJWK(publicKey)
+  publicJwk.kid = 'issuer-es256'
+  return { publicKey, privateKey, publicJwk }
+}
+```
+
 Return the issuer public key in this shape:
 
 ```json
 { "keys": [/* public JWK here */] }
+```
+
+So the route itself is small:
+
+```ts
+app.get('/.well-known/jwks.json', (_req, res) => {
+  res.json({ keys: [issuerKeys.publicJwk] })
+})
 ```
 
 ### 2. Implement `POST /credential-offers`

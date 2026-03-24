@@ -43,7 +43,10 @@ app.get('/.well-known/openid-credential-issuer', (_req: Request, res: Response) 
   })
 })
 
-// See labs/README-lab-01-issuance.md for the JWKS shape expected by the verifier.
+// Lab 01 hint: create issuerKeys once near the top of this file with jose
+// generateKeyPair('ES256') + exportJWK(publicKey), then return issuerKeys.publicJwk here.
+// You will reuse issuerKeys.privateKey later when signing the SD-JWT in /credential.
+// See labs/README-lab-01-issuance.md for the exact shape expected by the verifier.
 app.get('/.well-known/jwks.json', (_req: Request, res: Response) => {
   return notImplemented(res, 'Lab 01: publish issuer signing keys')
 })
