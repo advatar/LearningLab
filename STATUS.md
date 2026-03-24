@@ -22,6 +22,9 @@
 - [x] Add minimal mdoc `DeviceResponse` inspection for wallet direct-post handling
 - [x] Verify the live wallet flow with an mdoc PID
 - [x] Tell wallet users to add a PID document first via `EU Form` with name, date of birth, and nationality
+- [x] Harden wallet direct-post handling so malformed credential candidates do not crash the verifier
+- [x] Add verifier regression coverage for mixed and malformed wallet credential submissions
+- [ ] Redeploy the verifier after the wallet direct-post hardening fix
 
 - [x] Replace the workshop verifier self-signed leaf with a CA root plus verifier leaf chain
 - [x] Update the iOS wallet trust anchor to the workshop CA root

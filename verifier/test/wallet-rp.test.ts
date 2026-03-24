@@ -5,6 +5,7 @@ import {
   createWalletSession,
   extractPresentedCredentials,
   normalizeWalletDirectPostBody,
+  pickFirstSuccessfulWalletPresentation,
   summarizeWalletClaims
 } from '../src/wallet-rp.ts'
 
@@ -114,5 +115,31 @@ test('normalizeWalletDirectPostBody parses JSON strings and extractPresentedCred
   assert.deepEqual(
     extractPresentedCredentials([{ credential: 'credential-three' }, { sd_jwt: 'credential-four' }]),
     ['credential-three', 'credential-four']
+  )
+})
+
+test('pickFirstSuccessfulWalletPresentation skips malformed candidates until one succeeds', async () => {
+  const inspected: string[] = []
+  const selection = await pickFirstSuccessfulWalletPresentation(
+    ['bad-one', 'bad-two', 'good-three'],
+    async (credential) => {
+      inspected.push(credential)
+      if (credential !== 'good-three') throw new Error(`unsupported:${credential}`)
+      return { mode: 'verified' as const }
+    }
+  )
+
+  assert.deepEqual(inspected, ['bad-one', 'bad-two', 'good-three'])
+  assert.equal(selection.credential, 'good-three')
+  assert.deepEqual(selection.result, { mode: 'verified' })
+  assert.deepEqual(selection.skippedErrors, ['unsupported:bad-one', 'unsupported:bad-two'])
+})
+
+test('pickFirstSuccessfulWalletPresentation throws a stable error when every candidate fails', async () => {
+  await assert.rejects(
+    pickFirstSuccessfulWalletPresentation(['bad-one', 'bad-two'], async (credential) => {
+      throw new Error(`unsupported:${credential}`)
+    }),
+    /unsupported:bad-one/
   )
 })

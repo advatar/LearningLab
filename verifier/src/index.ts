@@ -21,6 +21,7 @@ import {
   createWalletSession,
   extractPresentedCredentials,
   normalizeWalletDirectPostBody,
+  pickFirstSuccessfulWalletPresentation,
   renderWalletQrSvg,
   renderWalletSessionPage,
   summarizeWalletClaims,
@@ -312,12 +313,31 @@ async function evaluateWalletDirectPost(session: WalletRpSession, body: WalletDi
     }
   }
 
-  const result = await inspectWalletPresentation(credentials[0], {
-    expectedAudience: session.clientId,
-    expectedNonce: session.nonce
-  })
+  let selectedPresentation
+  try {
+    selectedPresentation = await pickFirstSuccessfulWalletPresentation(credentials, (credential) =>
+      inspectWalletPresentation(credential, {
+        expectedAudience: session.clientId,
+        expectedNonce: session.nonce
+      })
+    )
+  } catch (error: any) {
+    return {
+      status: 'error',
+      receivedAt,
+      error: 'invalid_vp_token',
+      errorDescription: error?.message || 'No supported presented credential found',
+      presentationSubmission: body.presentation_submission,
+      raw
+    }
+  }
+
+  const result = selectedPresentation.result
   const summarizedClaims = summarizeWalletClaims(result.claims)
   const warningParts = []
+  if (selectedPresentation.skippedErrors.length > 0) {
+    warningParts.push(`ignored ${selectedPresentation.skippedErrors.length} unsupported presented credential candidate(s)`)
+  }
   if ('warning' in result && result.warning) warningParts.push(result.warning)
   if (summarizedClaims.over21Derived !== null) warningParts.push('age_over_21 derived from PID birthdate')
 
@@ -361,11 +381,16 @@ async function inspectWalletPresentation(
         mode: 'inspected' as const
       }
     }
-    const inspected = inspectSdJwtCredential(credential)
-    return {
-      ...inspected,
-      mode: 'inspected' as const,
-      warning: error?.message || 'inspection_only'
+    try {
+      const inspected = inspectSdJwtCredential(credential)
+      return {
+        ...inspected,
+        mode: 'inspected' as const,
+        warning: error?.message || 'inspection_only'
+      }
+    } catch (inspectionError: any) {
+      const detail = [error?.message, inspectionError?.message].filter(Boolean).join(' | ')
+      throw new Error(detail || 'unsupported_wallet_credential')
     }
   }
 }

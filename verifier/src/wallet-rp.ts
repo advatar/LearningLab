@@ -111,6 +111,12 @@ export type WalletClaimSummary = {
   over21Derived: boolean | null
 }
 
+export type WalletPresentationSelection<T> = {
+  credential: string
+  result: T
+  skippedErrors: string[]
+}
+
 export function deriveWalletVerifierProfile(baseUrl: string): WalletVerifierProfile {
   const url = new URL(baseUrl)
   return {
@@ -299,6 +305,25 @@ export function extractPresentedCredentials(vpToken: unknown): string[] {
     return Object.values(tokenRecord).flatMap((item) => extractPresentedCredentials(item))
   }
   return []
+}
+
+export async function pickFirstSuccessfulWalletPresentation<T>(
+  credentials: string[],
+  inspect: (credential: string) => Promise<T>
+): Promise<WalletPresentationSelection<T>> {
+  const skippedErrors: string[] = []
+  for (const credential of credentials) {
+    try {
+      return {
+        credential,
+        result: await inspect(credential),
+        skippedErrors
+      }
+    } catch (error: any) {
+      skippedErrors.push(error?.message || 'wallet_presentation_inspection_failed')
+    }
+  }
+  throw new Error(skippedErrors[0] || 'wallet_presentation_inspection_failed')
 }
 
 export function renderWalletSessionPage(session: WalletRpSession, qrSvg: string) {
