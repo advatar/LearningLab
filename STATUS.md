@@ -223,3 +223,7 @@ Wallet verification notes
 - [x] Add the pending repository-invitation step to the attendee onboarding docs
 - [x] Verify the updated attendee docs locally
 - [x] Commit and push the repository-invitation doc update
+- [x] Stop the internal starter-overrides README from replacing the student repo root README
+- [x] Rebuild the generated student template and verify the student-facing root README
+- [x] Publish the corrected root README to the starter repo and current Classroom assignment source repo
+- [ ] Commit and push the starter README fix

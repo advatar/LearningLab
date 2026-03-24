@@ -8,6 +8,10 @@ This folder gives you the missing pieces to turn your current monorepo into a pr
 - `starter-overrides/` — compile-friendly TODO versions of key runtime files
 - `status-store/` — a safer status-list allocation scaffold and patch notes
 
+Keep `starter-overrides/` limited to files that should actually ship to students.
+Internal notes belong in this README, not inside `starter-overrides/`, because that
+directory is copied verbatim into the generated starter repo.
+
 ## How to use it
 
 From your instructor repo root:
