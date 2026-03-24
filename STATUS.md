@@ -288,4 +288,4 @@ Wallet verification notes
 - [x] Add matching hint comments to the student issuer/verifier stubs for Labs 01–05
 - [x] Rebuild the student template and verify all simplified lab handouts are included
 - [x] Publish the simplified lab handouts to the starter repos
-- [ ] Commit and push the simplified lab-handout rewrite
+- [x] Commit and push the simplified lab-handout rewrite
