@@ -3,23 +3,13 @@ import QRCode from 'qrcode'
 
 const SESSION_TTL_MS = 15 * 60_000
 const QR_SIZE = 280
-const EUDI_PID_SD_JWT_VCTS = ['urn:eudi:pid:1']
 const EUDI_PID_MDOC_DOCTYPE = 'eu.europa.ec.eudi.pid.1'
 const EUDI_PID_MDOC_NAMESPACE = EUDI_PID_MDOC_DOCTYPE
 const X509_SAN_DNS_CLIENT_ID_SCHEME = 'x509_san_dns'
-const PID_BIRTHDATE_CLAIMS = ['birthdate', 'birth_date'] as const
-const PID_NATIONALITY_CLAIMS = ['nationalities', 'nationality'] as const
 
 type WalletClaimQuery = {
   id: string
   path: string[]
-}
-
-type SdJwtWalletCredentialQuery = {
-  id: string
-  format: 'dc+sd-jwt'
-  meta: { vct_values: string[] }
-  claims: WalletClaimQuery[]
 }
 
 type MdocWalletCredentialQuery = {
@@ -29,7 +19,7 @@ type MdocWalletCredentialQuery = {
   claims: WalletClaimQuery[]
 }
 
-type WalletCredentialQuery = SdJwtWalletCredentialQuery | MdocWalletCredentialQuery
+type WalletCredentialQuery = MdocWalletCredentialQuery
 
 export type WalletVerifierProfile = {
   baseUrl: string
@@ -97,10 +87,6 @@ export type WalletRequestObject = {
   }
   client_metadata: {
     vp_formats_supported: {
-      'dc+sd-jwt': {
-        'sd-jwt_alg_values': string[]
-        'kb-jwt_alg_values': string[]
-      }
       'mso_mdoc': Record<string, never>
     }
   }
@@ -169,10 +155,6 @@ export function buildWalletRequestObject(session: WalletRpSession, walletNonce?:
     dcql_query: buildWalletDcqlQuery(),
     client_metadata: {
       vp_formats_supported: {
-        'dc+sd-jwt': {
-          'sd-jwt_alg_values': ['ES256'],
-          'kb-jwt_alg_values': ['ES256']
-        },
         'mso_mdoc': {}
       }
     },
@@ -181,18 +163,6 @@ export function buildWalletRequestObject(session: WalletRpSession, walletNonce?:
 }
 
 export function buildWalletDcqlQuery() {
-  const pidBirthdateVariants: SdJwtWalletCredentialQuery[] = PID_BIRTHDATE_CLAIMS.flatMap((birthdateClaim) =>
-    PID_NATIONALITY_CLAIMS.map((nationalityClaim) => ({
-      id: `pid-${birthdateClaim}-and-${nationalityClaim}`,
-      format: 'dc+sd-jwt' as const,
-      meta: { vct_values: EUDI_PID_SD_JWT_VCTS },
-      claims: [
-        { id: birthdateClaim, path: [birthdateClaim] },
-        { id: nationalityClaim, path: [nationalityClaim] }
-      ]
-    }))
-  )
-
   const pidMdocVariants: WalletCredentialQuery[] = [
     {
       id: 'pid-mdoc-age-over-21-and-nationality',
@@ -215,28 +185,14 @@ export function buildWalletDcqlQuery() {
   ]
 
   return {
-    credentials: [
-      {
-        id: 'pid-age-over-21-and-nationality',
-        format: 'dc+sd-jwt' as const,
-        meta: { vct_values: EUDI_PID_SD_JWT_VCTS },
-        claims: [
-          { id: 'age_over_21', path: ['age_over_21'] },
-          { id: 'nationality', path: ['nationality'] }
-        ]
-      },
-      ...pidBirthdateVariants,
-      ...pidMdocVariants
-    ],
+    credentials: pidMdocVariants,
     credential_sets: [
       {
         options: [
-          ['pid-age-over-21-and-nationality'],
-          ...pidBirthdateVariants.map((credential) => [credential.id]),
           ...pidMdocVariants.map((credential) => [credential.id])
         ],
         purpose:
-          'Accept either a PID SD-JWT VC or a PID mdoc. If the credential exposes birth date instead of age_over_21, the verifier derives the over-21 decision locally.'
+          'Use the PID mdoc path for the public wallet demo. If the credential exposes birth_date instead of age_over_21, the verifier derives the over-21 decision locally.'
       }
     ]
   }
@@ -328,7 +284,6 @@ export async function pickFirstSuccessfulWalletPresentation<T>(
 
 export function renderWalletSessionPage(session: WalletRpSession, qrSvg: string) {
   const requestedClaims = [
-    'PID (SD-JWT VC): age_over_21 + nationality, or birthdate/birth_date + nationality/nationalities',
     'PID (MSO mdoc): age_over_21 + nationality, or birth_date + nationality under the PID namespace'
   ]
   const statusCopy =
