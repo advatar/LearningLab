@@ -277,3 +277,8 @@ Wallet verification notes
 - [x] Rebuild the student template and verify the credential-offer clarification is included
 - [x] Publish the credential-offer clarification to the starter repos
 - [x] Commit and push the credential-offer clarification update
+- [x] Explain in Lab 01 that the token response must be generated from the stored offer code
+- [x] Add a student stub hint for minting and storing access_token and c_nonce
+- [x] Rebuild the student template and verify the token clarification is included
+- [x] Publish the token clarification to the starter repos
+- [ ] Commit and push the token clarification update
