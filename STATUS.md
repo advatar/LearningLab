@@ -335,6 +335,6 @@ Wallet verification notes
 - [x] Configure the RP request to ask for `age_over >= 21` and `nationality`
 - [x] Install TLS reverse proxying for the public issuer/verifier domains
 - [x] Smoke-test the public issuer and verifier endpoints
-- [ ] Redeploy the public verifier with certificate-backed wallet request signing
-- [ ] Verify the live wallet request JWT now includes an `x5c` header
-- [ ] Commit and push the VM deployment status update
+- [x] Redeploy the public verifier with certificate-backed wallet request signing
+- [x] Verify the live wallet request JWT now includes an `x5c` header
+- [x] Commit and push the VM deployment status update
