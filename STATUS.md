@@ -299,3 +299,11 @@ Wallet verification notes
 - [x] Rebuild the student template and verify the Codespaces-only iProov wording is included
 - [x] Publish the Codespaces-only iProov wording to the starter repos
 - [x] Commit and push the Codespaces-only iProov wording update
+- [x] Add an optional student-facing mobile wallet lesson
+- [x] Rewrite the wallet runbook to use generic workspace paths and explicit clone instructions
+- [x] Make the wallet setup helper explicitly target a local terminal, not Codespaces
+- [x] Keep wallet/operator docs out of generated student repos
+- [x] Add a regression test for student-template wallet doc inclusion and exclusion
+- [x] Rebuild the student template, verify the new wallet lesson, and run tests/build
+- [x] Publish the wallet-doc cleanup to the starter repos
+- [ ] Commit and push the wallet-doc cleanup

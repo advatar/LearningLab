@@ -1,10 +1,18 @@
-// Lab 01: SD-JWT verifier (no BBS, no OHTTP, no iProov yet).
+// Lab 05: SD-JWT + BBS verifier with OHTTP, revocation, and BBS disclosure-time iProov checks.
+//
+// Important teaching note:
+// - with no LAB_ID, this file represents the final integrated verifier policy
+// - with LAB_ID set, it can temporarily relax or restore lesson-specific checks
+// - Lab 02 compatibility is intentionally narrow so the classroom can focus on
+//   pure BBS+ proof verification without changing the default integrated flow
 import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
 import { createHash, randomBytes } from 'node:crypto'
 import { decodeJwt, decodeProtectedHeader, importJWK, jwtVerify } from 'jose'
 import { base64ToBytes, verifyProof as verifyBbsProof } from 'bbs-lib'
+import { assertPassedIProovSession } from './iproov.js'
+import { shouldRequireIProovForBbsVerification } from './lab-compat.js'
 
 dotenv.config()
 
@@ -22,6 +30,8 @@ const USE_OHTTP = String(process.env.USE_OHTTP || 'false') === 'true'
 const OHTTP_RELAY_URL = process.env.OHTTP_RELAY_URL || ''
 const STATUS_LIST_ID = process.env.STATUS_LIST_ID || '1'
 const STATUS_LIST_URL = process.env.STATUS_LIST_URL || `${ISSUER_BASE_URL}/statuslist/${STATUS_LIST_ID}.json`
+// LAB_ID is injected by the lesson runner. Normal integrated runs leave it unset.
+const ACTIVE_LAB_ID = process.env.LAB_ID
 
 let lastPresentation: any = null
 let cachedJwks: any = null
@@ -105,14 +115,24 @@ async function verifyBbsPresentation(body: any) {
   if (typeof proofPayload.proof !== 'string' || !Array.isArray(proofPayload.revealedMessages)) {
     throw new Error('invalid_proof')
   }
+  const session = typeof body?.iproov_session === 'string' ? body.iproov_session.trim() : ''
+  // Final integrated mode expects an iProov session before BBS disclosure
+  // verification. LAB_ID=02 disables that single requirement so the student can
+  // complete the BBS lesson without first wiring the liveness flow.
+  if (!session && shouldRequireIProovForBbsVerification(ACTIVE_LAB_ID)) {
+    throw new Error('Complete the iProov ceremony before verifying the BBS+ disclosure')
+  }
   const nonce = proofPayload.nonce || 'bbs-demo-nonce'
   const publicKey = await fetchBbsPublicKey()
   const ok = await verifyBbsProof(base64ToBytes(proofPayload.proof), publicKey, proofPayload.revealedMessages, nonce)
   if (!ok) throw new Error('bbs_proof_failed')
+  if (session) {
+    await assertPassedIProovSession(ISSUER_BASE_URL, session, (input, init) => fetchViaRelay(String(input), init))
+  }
   if (body.credentialStatus) {
     await ensureNotRevoked(body.credentialStatus)
   }
-  return { revealedMessages: proofPayload.revealedMessages, nonce }
+  return { revealedMessages: proofPayload.revealedMessages, nonce, iproovSession: session }
 }
 
 async function verifySdJwtPresentation(body: any) {
@@ -183,9 +203,13 @@ async function fetchBbsPublicKey() {
 }
 
 async function fetchViaRelay(url: string, init?: RequestInit) {
-  if (!USE_OHTTP || !OHTTP_RELAY_URL) return fetch(url, init)
-  // Simple relay helper: for real OHTTP, point OHTTP_RELAY_URL at your worker.
-  return fetch(`${OHTTP_RELAY_URL}?target=${encodeURIComponent(url)}`, init)
+  try {
+    if (!USE_OHTTP || !OHTTP_RELAY_URL) return await fetch(url, init)
+    // Simple relay helper: for real OHTTP, point OHTTP_RELAY_URL at your worker.
+    return await fetch(`${OHTTP_RELAY_URL}?target=${encodeURIComponent(url)}`, init)
+  } catch (error: any) {
+    throw new Error(`fetch_failed ${url}: ${error?.message || 'unknown'}`)
+  }
 }
 
 async function ensureNotRevoked(status: { statusListIndex: string | number; statusListCredential?: string }) {

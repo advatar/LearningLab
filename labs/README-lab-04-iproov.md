@@ -34,7 +34,7 @@ If you are working outside Codespaces, use the demo-mode webhook path unless the
 ## Files you will edit
 
 - `issuer/src/index.ts`
-- optionally `wallet-ios/README.md` or related wallet code if you want to show the mobile hook
+- If you continue into Optional Lab 06 later, the wallet-specific code lives in the separate iOS or Android wallet repo, not inside `LearningLab`.
 
 ## Part 1: create a session endpoint
 
@@ -91,7 +91,7 @@ The behavior should be:
 
 ## Part 4: optional wallet hook
 
-If you are demoing the mobile wallet, the wallet should:
+If you continue into Optional Lab 06, the external wallet fork should:
 
 1. call `/iproov/claim`
 2. launch the iProov SDK

@@ -11,11 +11,10 @@ COPY . .
 # Deterministic install for "download and run" usage.
 RUN pnpm install -r --frozen-lockfile
 
-# Build issuer/verifier for a fast runtime image and to avoid file-watching inside Docker.
-RUN pnpm -r --filter issuer --filter verifier --filter bbs-lib --filter telemetry build
+# Build the runtime services used by the demo conductor.
+RUN pnpm -r --filter demo-conductor --filter issuer --filter verifier --filter bbs-lib --filter telemetry build
 
-EXPOSE 3001 3002
+EXPOSE 3001 3002 3210
 
 # Run the built services (not watch mode). Wallet tracks are out-of-container.
 CMD ["pnpm", "-r", "--parallel", "--filter", "issuer", "--filter", "verifier", "start"]
-

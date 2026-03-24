@@ -1,10 +1,23 @@
 services:
   learninglab:
     build: .
+    profiles: ["standalone"]
     ports:
       - "3001:3001"
       - "3002:3002"
     environment:
       ISSUER_PORT: "3001"
       VERIFIER_PORT: "3002"
-
+  demo-conductor:
+    build: .
+    command: ["pnpm", "--filter", "demo-conductor", "start"]
+    ports:
+      - "3210:3210"
+      - "3001:3001"
+      - "3002:3002"
+    environment:
+      DEMO_CONDUCTOR_PORT: "3210"
+      DEMO_CONDUCTOR_SERVICE_MODE: "start"
+      DEMO_CONDUCTOR_REPO_URL: "https://github.com/iProov-Education/LearningLab"
+      ISSUER_PORT: "3001"
+      VERIFIER_PORT: "3002"

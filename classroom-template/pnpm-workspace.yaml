@@ -1,4 +1,5 @@
 packages:
+  - 'demo-conductor'
   - 'issuer'
   - 'verifier'
   - 'bbs-lib'

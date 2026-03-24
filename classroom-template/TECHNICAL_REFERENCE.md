@@ -60,3 +60,9 @@ pnpm --filter status-list run generate
 ```bash
 curl http://localhost:3001/statuslist/1.json | jq
 ```
+
+## Public references
+
+- RSAC Conference session catalog: https://path.rsaconference.com/flow/rsac/us26/FullAgenda/page/catalog/session/1755524542872001ceX6
+- Beyond Compliance course site: https://beyondcompliance.showntell.dev
+- Beyond Compliance demo site: https://beyondcompliance-demo.showntell.dev

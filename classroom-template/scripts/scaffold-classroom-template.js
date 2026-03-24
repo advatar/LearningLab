@@ -28,11 +28,21 @@ const CLEAN = process.argv.includes('--clean')
 // Keeping them out of the template reduces confusion and protects
 // internal planning notes that are not part of the lab content.
 const ROOT_EXCLUDES = new Set([
+  'AGENTS.md',
   'CONSENT_BUDGETS.md',
+  'COURSE_CLASSROOM.md',
   'CURRENT_PLAN.md',
+  'LAB2-W01-Beyond_Compliance_A_Hands-On_Lab_for_Privacy-First_Digital_Identity.key',
   'LAB_ARTIFACT_PLAN.md',
+  'LESSON_RUNBOOK.md',
+  'learninglab-world-class-implementation-kit',
   'RESUME.md',
-  'SUBMISSION.md'
+  'STATUS.md',
+  'SUBMISSION.md',
+  'VILLAGE_DEMO_CONDUCTOR.md',
+  'WALLET_FORKS.md',
+  'wallet-android',
+  'wallet-ios'
 ])
 
 // Directories that should never be copied into a student template:
@@ -53,6 +63,10 @@ const EXCLUDE_FILES = new Set([
   '.DS_Store'
 ])
 
+const SENSITIVE_FILE_PREFIXES = [
+  'client_secret_'
+]
+
 function toPosix(p) {
   return p.split(path.sep).join('/')
 }
@@ -68,6 +82,7 @@ function shouldExclude(relPath, entry) {
 
   if (EXCLUDE_DIRS.has(base)) return true
   if (EXCLUDE_FILES.has(base)) return true
+  if (SENSITIVE_FILE_PREFIXES.some((prefix) => base.startsWith(prefix))) return true
 
   // .env files may contain secrets or environment-specific tokens.
   // We exclude them to avoid credential leakage in the public template.

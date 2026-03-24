@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Learning Lab Demo</title>
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <main class="page">
+      <header class="hero">
+        <div class="hero-copy">
+          <div class="hero-brand">
+            <img class="hero-logo" src="/brand/Master_iProov_Logo_2024_(White).svg" alt="iProov" />
+            <div>
+              <p class="eyebrow">Privacy-First Identity</p>
+              <h1>Learning Lab Demo</h1>
+            </div>
+          </div>
+          <p class="lede">
+            Explore privacy-first identity in action: issue credentials, complete iProov
+            liveness, share only what is needed, and see how relay protection and revocation
+            strengthen trust.
+          </p>
+        </div>
+        <div class="hero-actions">
+          <div class="account-panel">
+            <p class="eyebrow">Signed In</p>
+            <p id="account-name" class="account-name">Loading user...</p>
+            <p id="account-email" class="account-email"></p>
+            <button id="logout-button" class="button button-secondary" type="button">Log Out</button>
+          </div>
+          <a class="button button-secondary" href="/presenter-script.html" target="_blank" rel="noreferrer">Presenter Script</a>
+          <button id="reset-button" class="button button-danger" type="button">Reset My Session</button>
+          <a id="repo-link" class="button button-primary" href="#" target="_blank" rel="noreferrer">Open Repo</a>
+        </div>
+      </header>
+      <p class="hero-note">Reset My Session clears your credentials and progress for this session while leaving the live services available.</p>
+
+      <section class="layout">
+        <section class="panel">
+          <div class="panel-heading">
+            <h2>System Build</h2>
+            <p>Components light up as the demo assembles.</p>
+          </div>
+          <div id="component-grid" class="component-grid"></div>
+          <div class="snapshots">
+            <div class="snapshot">
+              <h3>Issuer Snapshot</h3>
+              <pre id="issued-snapshot"></pre>
+            </div>
+            <div class="snapshot">
+              <h3>Verifier Snapshot</h3>
+              <pre id="presentation-snapshot"></pre>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-heading">
+            <h2>Scenario Steps</h2>
+            <p>Follow the experience in order or revisit any step.</p>
+          </div>
+          <div id="step-list" class="step-list"></div>
+
+          <div id="iproov-panel" class="step-workspace is-hidden">
+            <div class="step-workspace-heading">
+              <h3>iProov Workspace</h3>
+              <p>When the iProov step is active, the live verification experience appears here.</p>
+            </div>
+            <div id="iproov-banner" class="status-banner"></div>
+            <div id="iproov-meta" class="iproov-meta"></div>
+            <div id="iproov-mount" class="iproov-mount">
+              <p class="iproov-placeholder">The ceremony surface will appear here when a live iProov session starts.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel panel-evidence">
+          <div class="panel-heading">
+            <h2>Evidence</h2>
+            <p>See the exact request, response, or system change behind each step.</p>
+          </div>
+          <div id="status-banner" class="status-banner"></div>
+          <div id="evidence-list" class="evidence-list"></div>
+          <div class="logs">
+            <div>
+              <h3>Issuer Logs</h3>
+              <pre id="issuer-logs"></pre>
+            </div>
+            <div>
+              <h3>Verifier Logs</h3>
+              <pre id="verifier-logs"></pre>
+            </div>
+          </div>
+          <div class="relay-panel">
+            <h3>Relay Traffic</h3>
+            <div id="relay-events" class="relay-events"></div>
+          </div>
+        </section>
+      </section>
+
+      <footer class="takeaway panel">
+        <div>
+          <p class="eyebrow">Take It Home</p>
+          <h2>Explore the project after the demo</h2>
+          <p id="repo-url-text" class="repo-url"></p>
+        </div>
+        <div id="qr-wrapper" class="qr-wrapper"></div>
+      </footer>
+    </main>
+
+    <script src="/app.js" defer></script>
+  </body>
+</html>

@@ -2,6 +2,8 @@
 
 Starter repo for the Beyond Compliance learning lab.
 
+Most students only need GitHub Classroom, GitHub Codespaces, and the lab docs below.
+
 ## Start Here
 
 1. Accept the GitHub Classroom invite shared by the instructors.
@@ -38,13 +40,12 @@ Local terminal fallback:
 - Lab 03: [labs/README-lab-03-ohttp.md](labs/README-lab-03-ohttp.md)
 - Lab 04: [labs/README-lab-04-iproov.md](labs/README-lab-04-iproov.md)
 - Lab 05: [labs/README-lab-05-revocation.md](labs/README-lab-05-revocation.md)
+- Optional Lab 06: [labs/README-lab-06-mobile-wallets.md](labs/README-lab-06-mobile-wallets.md) for the laptop-only mobile wallet track
 
-## More docs
+## Docs
+
+Student docs:
 
 - Quick start: [ATTENDEE_QUICKSTART.md](ATTENDEE_QUICKSTART.md)
-- Lab overview: [LEARNING_LAB.md](LEARNING_LAB.md)
-- Architecture and demo context: [DEMO.md](DEMO.md)
+- Optional mobile wallet runbook: [STUDENT_WALLET_RUNBOOK.md](STUDENT_WALLET_RUNBOOK.md) for local terminal + Xcode/Android Studio
 - Deeper technical reference: [TECHNICAL_REFERENCE.md](TECHNICAL_REFERENCE.md)
-- Mobile wallet notes:
-  - [wallet-ios/README.md](wallet-ios/README.md)
-  - [wallet-android/README.md](wallet-android/README.md)

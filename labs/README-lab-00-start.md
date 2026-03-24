@@ -117,4 +117,4 @@ Do not worry about understanding every TODO yet.
 
 - port already in use: change `ISSUER_PORT` or `VERIFIER_PORT` in your `.env` files
 - metadata returns `404`: make sure `pnpm dev` is still running
-- `pnpm` or Node missing locally: use the bootstrap instructions in the root [README.md](/Users/johansellstrom/dev/iproov/RSA/LearningLab/README.md)
+- `pnpm` or Node missing locally: use the bootstrap instructions in the root `README.md`

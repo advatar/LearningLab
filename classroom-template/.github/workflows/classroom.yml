@@ -8,14 +8,14 @@ on:
   workflow_dispatch:
     inputs:
       lab_id:
-        # Optional override for which lab to grade. If omitted, lab-check.js will
-        # infer from the branch name or use the LAB_ID repo variable.
-        description: "Optional lab ID (00-05). If omitted, derived from branch name or LAB_ID variable."
+        # Optional override for which lab to grade. Preferred control plane is
+        # the LAB_ID repo variable; branch inference remains as a fallback.
+        description: "Optional lab ID (00-05). Preferred source is LAB_ID; branch naming is fallback only."
         required: false
         type: string
   push:
-    # Run on main to validate baseline content, and on lab-* branches so each
-    # lab can be graded independently as students work through the sequence.
+    # Run on main for the hosted course repo. lab-* branches remain useful as a
+    # developer fallback when testing branch-based inference locally.
     branches:
       - main
       - lab-*
@@ -35,8 +35,8 @@ jobs:
     env:
       # CI=true helps downstream tooling (pnpm/node) run in non-interactive mode.
       CI: true
-      # LAB_ID is optional. If present, it forces which lab to grade. If absent,
-      # lab-check.js will infer from branch name (lab-01-*) or default to 01.
+      # Preferred production control plane: set LAB_ID on the student repo.
+      # Branch inference is kept only as a fallback for local/dev workflows.
       LAB_ID: ${{ inputs.lab_id || vars.LAB_ID }}
     steps:
       - name: Checkout

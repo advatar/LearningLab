@@ -1,7 +1,28 @@
 node_modules/
+
+# Local environment files
 .env
 .env.*
+client_secret_*.apps.googleusercontent.com.json
+
+# Build and test artifacts
 dist/
 coverage/
+*.tsbuildinfo
+
+# Cloudflare Wrangler local state
+.wrangler/
+.dev.vars
+.dev.vars.*
+
+# Logs
 *.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor and OS files
 .DS_Store
+.idea/
+.vscode/

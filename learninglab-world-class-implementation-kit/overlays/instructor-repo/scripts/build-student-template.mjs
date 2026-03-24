@@ -22,10 +22,16 @@ const EXCLUDE_DIRS = new Set([
 
 const EXCLUDE_ROOT_ITEMS = new Set([
   'AGENTS.md',
+  'LAB2-W01-Beyond_Compliance_A_Hands-On_Lab_for_Privacy-First_Digital_Identity.key',
   'classroom-template',
+  'COURSE_CLASSROOM.md',
   'LESSON_RUNBOOK.md',
   'learninglab-world-class-implementation-kit',
-  'STATUS.md'
+  'STATUS.md',
+  'VILLAGE_DEMO_CONDUCTOR.md',
+  'WALLET_FORKS.md',
+  'wallet-android',
+  'wallet-ios'
 ])
 
 const EXCLUDE_FILES = new Set([
