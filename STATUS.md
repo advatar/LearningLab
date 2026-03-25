@@ -45,7 +45,7 @@
 - [x] Redeploy the verifier after the wallet result-page update
 - [x] Relax the demo-conductor login flow to allow open access even when Google auth is configured
 - [x] Add demo-conductor regression coverage for the open-login fallback
-- [ ] Redeploy the demo conductor after the open-login change
+- [x] Redeploy the demo conductor after the open-login change
 
 - [x] Replace the workshop verifier self-signed leaf with a CA root plus verifier leaf chain
 - [x] Update the iOS wallet trust anchor to the workshop CA root
