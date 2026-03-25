@@ -1,5 +1,6 @@
 # Status
 
+- [x] Add explicit starter-repo propagation rules to `AGENTS.md`
 - [x] Add a student-safe take-home bundle export for the integrated working repo
 - [x] Verify the take-home bundle excludes instructor-only material and includes the working implementation
 - [x] Document how to generate and hand out the take-home zip at the end of the session
